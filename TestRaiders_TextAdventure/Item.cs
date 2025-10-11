@@ -8,17 +8,16 @@ namespace TestRaiders_TextAdventure
 {
     public class Item
     {
+        private static int _counter = 0; // interne teller om unieke IDs te maken
         public string Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
 
-        public Item(string id, string name, string description)
+        // Maakt een nieuw item aan met een automatisch ID.
+        public Item(string name, string description)
         {
-            //Id mag niet leeg of null zijn.
-            if (string.IsNullOrWhiteSpace(id))
-                throw new ArgumentException("Item Id mag niet leeg zijn.", nameof(id));
-
-            Id = id;
+            _counter++;
+            Id = $"item_{_counter}";
             Name = name;
             Description = description;
         }
