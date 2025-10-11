@@ -8,7 +8,7 @@ namespace TestRaiders_TextAdventure
 {
     public class Item
     {
-        private static int _counter = 0; // interne teller om unieke IDs te maken
+        private static int _maxId = 0; // interne teller om unieke IDs te maken
         public string Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
@@ -16,8 +16,8 @@ namespace TestRaiders_TextAdventure
         // Maakt een nieuw item aan met een automatisch ID.
         public Item(string name, string description)
         {
-            _counter++;
-            Id = $"item_{_counter}";
+            _maxId++;
+            Id = $"item_{_maxId}";
             Name = name;
             Description = description;
         }
