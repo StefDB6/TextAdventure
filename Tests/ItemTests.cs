@@ -1,4 +1,5 @@
 ﻿using TestRaiders_TextAdventure;
+using TestRaiders_TextAdventure.Core.Models;
 namespace Tests
 {
     [TestClass]

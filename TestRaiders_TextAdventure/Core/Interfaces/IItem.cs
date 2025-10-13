@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TestRaiders_TextAdventure
+namespace TestRaiders_TextAdventure.Core.Interfaces
 {
     // Publieke interface voor een spel-item.
-    public interface Iitem
+    public interface IItem
     {
         string Id { get; }
         string Name { get; set; }
