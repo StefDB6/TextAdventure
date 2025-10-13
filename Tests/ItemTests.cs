@@ -17,6 +17,27 @@ namespace Tests
             Assert.AreEqual("Opent deur", item.Description);
         }
 
+        [TestMethod]
+        // werkt de tweede constructor (met chaining) zonder description
+        public void Constructor_Chaining_Creates_AutoDescription()
+        {
+            var item = new Item("Sleutel"); // gebruikt constructor chaining
+
+            Assert.IsNotNull(item.Id);
+            StringAssert.StartsWith(item.Id, "item_");
+            Assert.AreEqual("Sleutel", item.Name);
+            Assert.AreEqual("beschrijving: Sleutel.", item.Description);
+        }
+
+        [TestMethod]
+        // lege beschrijving krijgt ook automatisch een tekst
+        public void Empty_Description_Generates_Default_Description()
+        {
+            var item = new Item("Zwaard", "");
+
+            Assert.AreEqual("beschrijving: Zwaard.", item.Description);
+        }
+
         // Test dat twee verschillende items unieke IDs krijgen.
         [TestMethod]
         public void Each_Item_Has_Unique_Id()
