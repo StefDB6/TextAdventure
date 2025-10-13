@@ -42,5 +42,8 @@ namespace TestRaiders_TextAdventure.Core.Interfaces
 
         // Returns all items currently in the room.
         IEnumerable<IItem> GetItems();
+
+        // Helper: generate a default description from the room name
+        static string GenerateDefaultDescription(string name) => $"description: {name}.";
     }
 }

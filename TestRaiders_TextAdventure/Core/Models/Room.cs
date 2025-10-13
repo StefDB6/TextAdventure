@@ -19,6 +19,10 @@ namespace TestRaiders_TextAdventure.Core.Models
         public bool HasMonster { get; set; }
         public bool MonsterAlive { get; set; }
 
+        public Room(string name)
+            : this(name, GenerateDefaultDescription(name))
+        { }
+
         public Room(string name, string description, bool isDeadly = false, bool requiresKey = false, bool hasMonster = false)
         {
             Name = name;
@@ -28,6 +32,9 @@ namespace TestRaiders_TextAdventure.Core.Models
             HasMonster = hasMonster;
             MonsterAlive = hasMonster;
         }
+
+        public static string GenerateDefaultDescription(string name)
+            => $"description: {name}.";
 
         public void AddExit(Direction direction, IRoom room)
         {

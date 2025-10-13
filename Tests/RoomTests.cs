@@ -159,5 +159,37 @@ namespace Tests
             Assert.IsTrue(finalRoom.HasMonster);
             Assert.IsTrue(finalRoom.MonsterAlive);
         }
+
+        [TestMethod]
+        // Tests the static GenerateDefaultDescription helper
+        public void GenerateDefaultDescription_Returns_Correct_Format()
+        {
+            var result = Room.GenerateDefaultDescription("Hall");
+            Assert.AreEqual("description: Hall.", result);
+        }
+
+        [TestMethod]
+        // Tests that the short constructor chains and generates a default description
+        public void Constructor_OnlyName_Generates_Default_Description()
+        {
+            var room = new Room("Dungeon");
+
+            Assert.AreEqual("Dungeon", room.Name);
+            Assert.AreEqual("description: Dungeon.", room.Description);
+            Assert.IsFalse(room.IsDeadly);
+            Assert.IsFalse(room.RequiresKey);
+            Assert.IsFalse(room.HasMonster);
+        }
+
+        [TestMethod]
+        // Tests that the main constructor overrides description properly
+        public void Constructor_WithCustomDescription_Does_Not_Use_Default()
+        {
+            var room = new Room("Garden", "A calm, open area with flowers.");
+
+            Assert.AreEqual("Garden", room.Name);
+            Assert.AreEqual("A calm, open area with flowers.", room.Description);
+            Assert.AreNotEqual(Room.GenerateDefaultDescription("Garden"), room.Description);
+        }
     }
 }
