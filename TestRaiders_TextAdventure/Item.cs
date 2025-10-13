@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace TestRaiders_TextAdventure
 {
-    public class Item
+    public class Item : Iitem
     {
         private static int _maxId = 0; // interne teller om unieke IDs te maken
-        public string Id { get; set; }
+        public string Id { get;}
         public string Name { get; set; }
         public string Description { get; set; }
 
