@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TestRaiders_TextAdventure.Core.Interfaces
 {
-    // Publieke interface voor een spel-item.
+    // Public interface for a game-item.
     public interface IItem
     {
         string Id { get; }

@@ -10,7 +10,7 @@ namespace Tests
     [TestClass]
     public class DirectionTests
     {
-        // Test dat de Direction-enum exact vier waarden bevat.
+        // Test that the Direction-enum contains exact four values.
         [TestMethod]
         public void Enum_Has_Four_Directions()
         {
@@ -18,7 +18,7 @@ namespace Tests
             Assert.AreEqual(4, values.Length);
         }
 
-        //Test dat de Direction-enum de verwachte namen bevat
+        // Test that the Direction enum contains the expected names
         [TestMethod]
         public void Enum_Contains_Expected_Names()
         {

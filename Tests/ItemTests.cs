@@ -6,74 +6,74 @@ namespace Tests
     public class ItemTests
     {
         [TestMethod]
-        //werkt de constructor wanneer je een Item object aanmaakt
+        //does the constructor work when you create an Item object
         public void Constructor_Sets_Properties_And_Generates_Id()
         {
-            var item = new Item("Sleutel", "Opent deur");
+            var item = new Item("Key", "Opens door");
 
-            Assert.IsNotNull(item.Id, "Id mag niet null zijn.");
+            Assert.IsNotNull(item.Id, "Id can not be null.");
             StringAssert.StartsWith(item.Id, "item_");
-            Assert.AreEqual("Sleutel", item.Name);
-            Assert.AreEqual("Opent deur", item.Description);
+            Assert.AreEqual("Key", item.Name);
+            Assert.AreEqual("Opens door", item.Description);
         }
 
         [TestMethod]
-        // werkt de tweede constructor (met chaining) zonder description
+        // does the second constructor (with chaining) work without a description
         public void Constructor_Chaining_Creates_AutoDescription()
         {
-            var item = new Item("Sleutel"); // gebruikt constructor chaining
+            var item = new Item("Key"); // uses constructor chaining
 
-            Assert.AreEqual("Sleutel", item.Name);
-            Assert.AreEqual("beschrijving: Sleutel.", item.Description);
+            Assert.AreEqual("Key", item.Name);
+            Assert.AreEqual("description: Key.", item.Description);
         }
 
         [TestMethod]
-        // werkt de tweede constructor (met chaining) voor een random ID
+        // does the second constructor (with chaining) work for a random ID
         public void Constructor_Chaining_Creates_Id()
         {
-            var item = new Item("Sleutel"); // gebruikt constructor chaining
+            var item = new Item("Key"); // uses constructor chaining
 
             Assert.IsNotNull(item.Id);
             StringAssert.StartsWith(item.Id, "item_");
         }
 
         [TestMethod]
-        // lege beschrijving krijgt ook automatisch een tekst
+        // an empty description also automatically gets a text
         public void Empty_Description_Generates_Default_Description()
         {
-            var item = new Item("Zwaard", "");
+            var item = new Item("Sword", "");
 
-            Assert.AreEqual("beschrijving: Zwaard.", item.Description);
+            Assert.AreEqual("description: Sword.", item.Description);
         }
 
-        // Test dat twee verschillende items unieke IDs krijgen.
+        // test that two different items get unique IDs
         [TestMethod]
         public void Each_Item_Has_Unique_Id()
         {
-            var i1 = new Item("Sleutel", "Opent deur");
-            var i2 = new Item("Zwaard", "Tegen monsters");
+            var i1 = new Item("Key", "Opens door");
+            var i2 = new Item("Sword", "Against Monsters");
 
-            Assert.AreNotEqual(i1.Id, i2.Id, "IDs moeten uniek zijn.");
+            Assert.AreNotEqual(i1.Id, i2.Id, "IDs have to be unique.");
         }
 
         [TestMethod]
 
-        //props zijn niet read-only dus we moeten testen of deze nog wijzigbaar zijn
+        // properties are not read-only, so we need to test whether they can still be modified
         public void Properties_Are_Mutable() 
         {
-            var item = new Item("Zwaard", "Tegen monsters");
+            var item = new Item("Sword", "Against Monsters");
 
-            item.Name = "Stalen zwaard";
-            item.Description = "Scherp";
+            item.Name = "Steel sword";
+            item.Description = "Sharp";
 
-            Assert.AreEqual("Stalen zwaard", item.Name);
-            Assert.AreEqual("Scherp", item.Description);
+            Assert.AreEqual("Steel sword", item.Name);
+            Assert.AreEqual("Sharp", item.Description);
         }
 
         [TestMethod]
-        // Test dat de ToString()-methode van Item een leesbare tekst teruggeeft 
-        // die minstens de naam en het ID van het item bevat.
-        // Zo weten we dat de methode nuttige informatie toont voor de speler.
+        // test that the ToString() method of Item returns a readable text
+        // that includes at least the name and ID of the item.
+        // this way, we know that the method shows useful information for the player.
         public void ToString_Contains_Name_And_Id()
         {
             var item = new Item("Sleutel", "Opent deur");

@@ -9,26 +9,26 @@ namespace TestRaiders_TextAdventure.Core.Models
 {
     public class Item : IItem
     {
-        private static int _maxId = 0; // interne teller om unieke IDs te maken
+        private static int _maxId = 0; // internal counter to create unique IDs
         public string Id { get;}
         public string Name { get; set; }
         public string Description { get; set; }
 
-        // Maakt een nieuw item aan met een automatisch ID.
+        // creates a new item with an automatic ID
         public Item(string name, string description)
         {
             _maxId++;
             Id = $"item_{_maxId}";
             Name = name;
-            
-            // Als de beschrijving leeg is, maak een standaardbeschrijving aan
+
+            // if the description is empty, create a default description
             Description = string.IsNullOrWhiteSpace(description)
                 ? GenerateDefaultDescription(name)
                 : description;
         }
 
-        // Extra constructor: maakt een nieuw item met enkel een naam.
-        // Roept de hoofdconstructor aan met een automatisch gegenereerde beschrijving.
+        // additional constructor: creates a new item with only a name.
+        // calls the main constructor with an automatically generated description.
         public Item(string name) : this(name, "")
         {
             
@@ -36,7 +36,7 @@ namespace TestRaiders_TextAdventure.Core.Models
 
         // Genereert een standaardbeschrijving wanneer er geen description is opgegeven.
         private static string GenerateDefaultDescription(string name)
-            => $"beschrijving: {name}.";
+            => $"description: {name}.";
 
 
         public override string ToString() => $"{Name} ({Id}) - {Description}";
