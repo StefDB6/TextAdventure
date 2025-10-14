@@ -23,10 +23,18 @@ namespace Tests
         {
             var item = new Item("Sleutel"); // gebruikt constructor chaining
 
-            Assert.IsNotNull(item.Id);
-            StringAssert.StartsWith(item.Id, "item_");
             Assert.AreEqual("Sleutel", item.Name);
             Assert.AreEqual("beschrijving: Sleutel.", item.Description);
+        }
+
+        [TestMethod]
+        // werkt de tweede constructor (met chaining) voor een random ID
+        public void Constructor_Chaining_Creates_Id()
+        {
+            var item = new Item("Sleutel"); // gebruikt constructor chaining
+
+            Assert.IsNotNull(item.Id);
+            StringAssert.StartsWith(item.Id, "item_");
         }
 
         [TestMethod]
