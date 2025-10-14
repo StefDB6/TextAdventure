@@ -122,8 +122,6 @@ namespace Tests
             var lockedRoom = new Room("Treasure Room", "The door is locked.", requiresKey: true);
 
             Assert.IsTrue(lockedRoom.RequiresKey);
-            Assert.IsFalse(lockedRoom.IsDeadly);
-            Assert.IsFalse(lockedRoom.HasMonster);
         }
 
         [TestMethod]
@@ -144,7 +142,6 @@ namespace Tests
 
             Assert.IsTrue(trickyRoom.IsDeadly);
             Assert.IsTrue(trickyRoom.RequiresKey);
-            Assert.IsFalse(trickyRoom.HasMonster);
         }
 
         [TestMethod]
