@@ -24,7 +24,7 @@ namespace Tests
         public void AddItem_Adds_One_Item()
         {
             Inventory inventory = new();
-            Item item = new("Key");
+            Item item = new("Key", ItemType.Key);
             inventory.Add(item);
             var test = inventory.GetAll();
             Assert.AreEqual(1, test.Count);
@@ -34,11 +34,12 @@ namespace Tests
         public void AddItem_Adds_Correct_Item()
         {
             Inventory inventory = new();
-            Item item = new("Key", "Opens doors");
+            Item item = new("Key to hell", "Opens doors", ItemType.Key);
             inventory.Add(item);
-            var test = inventory.GetAll();
-            Assert.AreEqual(test[0].Name, "Key");
-            Assert.AreEqual(test[0].Description, "Opens doors");
+            List<IItem> inventoryList = inventory.GetAll();
+            Assert.AreEqual(inventoryList[0].Name, "Key to hell");
+            Assert.AreEqual(inventoryList[0].Description, "Opens doors");
+            Assert.AreEqual(inventoryList[0].Type, ItemType.Key);
         }
     }
 }

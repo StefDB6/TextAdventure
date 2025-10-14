@@ -20,7 +20,7 @@ namespace TestRaiders_TextAdventure.Core.Models
             _maxId++;
             Id = $"item_{_maxId}";
             Name = name;
-            
+
             // Als de beschrijving leeg is, maak een standaardbeschrijving aan
             Description = string.IsNullOrWhiteSpace(description)
                 ? GenerateDefaultDescription(name)
@@ -31,7 +31,7 @@ namespace TestRaiders_TextAdventure.Core.Models
         // Roept de hoofdconstructor aan met een automatisch gegenereerde beschrijving.
         public Item(string name) : this(name, "")
         {
-            
+
         }
 
         // Genereert een standaardbeschrijving wanneer er geen description is opgegeven.
