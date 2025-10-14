@@ -13,13 +13,15 @@ namespace TestRaiders_TextAdventure.Core.Models
         public string Id { get;}
         public string Name { get; set; }
         public string Description { get; set; }
+        public ItemType Type { get; private set; }
 
         // creates a new item with an automatic ID
-        public Item(string name, string description)
+        public Item(string name, ItemType type, string description)
         {
             _maxId++;
             Id = $"item_{_maxId}";
             Name = name;
+            Type = type;
 
             // if the description is empty, create a default description
             Description = string.IsNullOrWhiteSpace(description)
@@ -29,7 +31,7 @@ namespace TestRaiders_TextAdventure.Core.Models
 
         // additional constructor: creates a new item with only a name.
         // calls the main constructor with an automatically generated description.
-        public Item(string name) : this(name, "")
+        public Item(string name,ItemType type) : this(name,type, "")
         {
             
         }
@@ -39,6 +41,6 @@ namespace TestRaiders_TextAdventure.Core.Models
             => $"description: {name}.";
 
 
-        public override string ToString() => $"{Name} ({Id}) - {Description}";
+        public override string ToString() => $"{Name} ({Id}) - {Description} [{Type}]";
     }
 }

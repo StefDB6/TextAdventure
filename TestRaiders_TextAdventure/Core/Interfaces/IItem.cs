@@ -12,6 +12,7 @@ namespace TestRaiders_TextAdventure.Core.Interfaces
         string Id { get; }
         string Name { get; set; }
         string Description { get; set; }
+        ItemType Type { get; }
 
         string ToString();
     }

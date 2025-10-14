@@ -9,29 +9,32 @@ namespace Tests
         //does the constructor work when you create an Item object
         public void Constructor_Sets_Properties_And_Generates_Id()
         {
-            var item = new Item("Key", "Opens door");
+            var item = new Item("Sleutel", ItemType.Key, "Opent deur");
 
-            Assert.IsNotNull(item.Id, "Id can not be null.");
+            Assert.IsNotNull(item.Id, "Id mag niet null zijn.");
             StringAssert.StartsWith(item.Id, "item_");
-            Assert.AreEqual("Key", item.Name);
-            Assert.AreEqual("Opens door", item.Description);
+            Assert.AreEqual("Sleutel", item.Name);
+            Assert.AreEqual("Opent deur", item.Description);
+            Assert.AreEqual(ItemType.Key, item.Type);  // type gets set through ctor
         }
 
         [TestMethod]
         // does the second constructor (with chaining) work without a description
-        public void Constructor_Chaining_Creates_AutoDescription()
+        public void Constructor_Chaining_Sets_AutoDescription()
         {
-            var item = new Item("Key"); // uses constructor chaining
+            var item = new Item("Key", ItemType.Key); // uses constructor chaining
 
             Assert.AreEqual("Key", item.Name);
             Assert.AreEqual("description: Key.", item.Description);
+            Assert.AreEqual(ItemType.Key, item.Type);
         }
+
 
         [TestMethod]
         // does the second constructor (with chaining) work for a random ID
         public void Constructor_Chaining_Creates_Id()
         {
-            var item = new Item("Key"); // uses constructor chaining
+            var item = new Item("Key", ItemType.Key); // uses constructor chaining
 
             Assert.IsNotNull(item.Id);
             StringAssert.StartsWith(item.Id, "item_");
@@ -41,7 +44,7 @@ namespace Tests
         // an empty description also automatically gets a text
         public void Empty_Description_Generates_Default_Description()
         {
-            var item = new Item("Sword", "");
+            var item = new Item("Sword",ItemType.Sword, "");
 
             Assert.AreEqual("description: Sword.", item.Description);
         }
@@ -50,8 +53,8 @@ namespace Tests
         [TestMethod]
         public void Each_Item_Has_Unique_Id()
         {
-            var i1 = new Item("Key", "Opens door");
-            var i2 = new Item("Sword", "Against Monsters");
+            var i1 = new Item("Key",ItemType.Key, "Opens door");
+            var i2 = new Item("Sword",ItemType.Sword, "Against Monsters");
 
             Assert.AreNotEqual(i1.Id, i2.Id, "IDs have to be unique.");
         }
@@ -61,13 +64,14 @@ namespace Tests
         // properties are not read-only, so we need to test whether they can still be modified
         public void Properties_Are_Mutable() 
         {
-            var item = new Item("Sword", "Against Monsters");
+            var item = new Item("Sword",ItemType.Sword, "Against Monsters");
 
             item.Name = "Steel sword";
             item.Description = "Sharp";
 
             Assert.AreEqual("Steel sword", item.Name);
             Assert.AreEqual("Sharp", item.Description);
+            Assert.AreEqual(ItemType.Sword, item.Type); // has to stay the same (no setter)
         }
 
         [TestMethod]
@@ -76,7 +80,7 @@ namespace Tests
         // this way, we know that the method shows useful information for the player.
         public void ToString_Contains_Name_And_Id()
         {
-            var item = new Item("Sleutel", "Opent deur");
+            var item = new Item("Sleutel", ItemType.Key, "Opent deur");
             var s = item.ToString();
 
             StringAssert.Contains(s, "Sleutel");
