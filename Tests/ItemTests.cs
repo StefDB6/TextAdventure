@@ -51,7 +51,7 @@ namespace Tests
         [TestMethod]
 
         //props zijn niet read-only dus we moeten testen of deze nog wijzigbaar zijn
-        public void Properties_Are_Mutable() 
+        public void Properties_Are_Mutable()
         {
             var item = new Item("Zwaard", "Tegen monsters");
 
