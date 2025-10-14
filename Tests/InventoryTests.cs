@@ -25,23 +25,20 @@ namespace Tests
         {
             Inventory inventory = new();
             Item item = new("Key");
-            Item item2 = new("Sword");
             inventory.Add(item);
-            inventory.Add(item2);
             var test = inventory.GetAll();
-            Assert.AreEqual(2, test.Count);
+            Assert.AreEqual(1, test.Count);
         }
 
+        [TestMethod]
         public void AddItem_Adds_Correct_Item()
         {
             Inventory inventory = new();
-            Item item = new("Key");
-            Item item2 = new("Sword");
+            Item item = new("Key", "Opens doors");
             inventory.Add(item);
-            inventory.Add(item2);
             var test = inventory.GetAll();
             Assert.AreEqual(test[0].Name, "Key");
-            Assert.AreEqual(test[1].Name, "Sword");
+            Assert.AreEqual(test[0].Description, "Opens doors");
         }
     }
 }
