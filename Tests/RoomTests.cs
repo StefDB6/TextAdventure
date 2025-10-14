@@ -31,19 +31,35 @@ namespace Tests
             Assert.IsFalse(_room.HasMonster);
         }
 
-        [TestMethod]
-        // Tests if exits can be added and retrieved
-        public void AddExit_And_GetExit_Works()
-        {
-            var nextRoom = new Room("Library", "Full of books.");
-            _room.AddExit(Direction.North, nextRoom);
+								[TestMethod]
+								public void AddExit_Stores_Room_In_Exits()
+								{
+												var nextRoom = new Room("Library", "Full of books.");
+												_room.AddExit(Direction.North, nextRoom);
 
-            var result = _room.GetExit(Direction.North);
+												Assert.IsTrue(_room.Exits.ContainsKey(Direction.North));
+												Assert.AreSame(nextRoom, _room.Exits[Direction.North]);
+								}
 
-            Assert.AreEqual(nextRoom, result);
-        }
+								[TestMethod]
+								public void GetExit_Returns_Correct_Room()
+								{
+												var nextRoom = new Room("Library", "Full of books.");
+												_room.AddExit(Direction.East, nextRoom);
 
-        [TestMethod]
+												var result = _room.GetExit(Direction.East);
+
+												Assert.AreSame(nextRoom, result);
+								}
+
+								[TestMethod]
+								public void GetExit_Returns_Null_When_No_Exit_Exists()
+								{
+												var result = _room.GetExit(Direction.West);
+												Assert.IsNull(result);
+								}
+
+								[TestMethod]
         // Tests if items can be added to the room
         public void AddItem_Adds_Item_To_Room()
         {
