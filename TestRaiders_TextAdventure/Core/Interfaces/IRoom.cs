@@ -44,6 +44,8 @@ namespace TestRaiders_TextAdventure.Core.Interfaces
         IEnumerable<IItem> GetItems();
 
         // Helper: generate a default description from the room name
-        static string GenerateDefaultDescription(string name) => $"description: {name}.";
+        static string GenerateDefaultDescription(string name) {
+            return $"description: {name}.";
+								}
     }
 }
