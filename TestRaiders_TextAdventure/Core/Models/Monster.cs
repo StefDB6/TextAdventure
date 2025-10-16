@@ -2,22 +2,13 @@ namespace TestRaiders_TextAdventure.Core.Models;
 
 public class Monster
 {
-    private string name;
-    public string Name 
-    { 
-        get { return name; } 
-    }
+    public string Name { get; }
     
-    private bool isAlive = true;
-    public bool IsAlive 
-    { 
-        get { return isAlive; }
-        private set { isAlive = value; }
-    }
+    public bool IsAlive { get; private set; } = true;
 
     public Monster(string name)
     {
-        this.name = name;
+        Name = name;
     }
 
     public void Attack()
