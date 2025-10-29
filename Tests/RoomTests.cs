@@ -31,39 +31,39 @@ namespace Tests
             Assert.IsFalse(_room.HasMonster);
         }
 
-								[TestMethod]
-								public void AddExit_Stores_Room_In_Exits()
-								{
-												var nextRoom = new Room("Library", "Full of books.");
-												_room.AddExit(Direction.North, nextRoom);
+		[TestMethod]
+		public void AddExit_Stores_Room_In_Exits()
+		{
+			var nextRoom = new Room("Library", "Full of books.");
+			_room.AddExit(Direction.North, nextRoom);
 
-												Assert.IsTrue(_room.Exits.ContainsKey(Direction.North));
-												Assert.AreSame(nextRoom, _room.Exits[Direction.North]);
-								}
+			Assert.IsTrue(_room.Exits.ContainsKey(Direction.North));
+			Assert.AreSame(nextRoom, _room.Exits[Direction.North]);
+		}
 
-								[TestMethod]
-								public void GetExit_Returns_Correct_Room()
-								{
-												var nextRoom = new Room("Library", "Full of books.");
-												_room.AddExit(Direction.East, nextRoom);
+		[TestMethod]
+		public void GetExit_Returns_Correct_Room()
+		{
+			var nextRoom = new Room("Library", "Full of books.");
+			_room.AddExit(Direction.East, nextRoom);
 
-												var result = _room.GetExit(Direction.East);
+			var result = _room.GetExit(Direction.East);
 
-												Assert.AreSame(nextRoom, result);
-								}
+			Assert.AreSame(nextRoom, result);
+		}
 
-								[TestMethod]
-								public void GetExit_Returns_Null_When_No_Exit_Exists()
-								{
-												var result = _room.GetExit(Direction.West);
-												Assert.IsNull(result);
-								}
+		[TestMethod]
+		public void GetExit_Returns_Null_When_No_Exit_Exists()
+		{
+			var result = _room.GetExit(Direction.West);
+			Assert.IsNull(result);
+		}
 
-								[TestMethod]
+		[TestMethod]
         // Tests if items can be added to the room
         public void AddItem_Adds_Item_To_Room()
         {
-            var item = new Item("Key", "A shiny key");
+            var item = new Item("Key", ItemType.Key);
             _room.AddItem(item);
 
             var items = _room.GetItems().ToList();
@@ -76,7 +76,7 @@ namespace Tests
         // Tests if TakeItem removes and returns the correct item
         public void TakeItem_Removes_And_Returns_Item()
         {
-            var item = new Item("Sword", "A sharp weapon");
+            var item = new Item("Sword", ItemType.Sword);
             _room.AddItem(item);
 
             var result = _room.TakeItem(item.Id);
