@@ -19,10 +19,10 @@ namespace TestRaiders_TextAdventure.Core.Models
         public bool HasMonster { get; set; }
         public bool MonsterAlive { get; set; }
 
-								// Expose exits for testing (read-only)
-								internal IReadOnlyDictionary<Direction, IRoom> Exits => _exits;
+			// Expose exits for testing (read-only)
+			internal IReadOnlyDictionary<Direction, IRoom> Exits => _exits;
 
-								public Room(string name)
+			public Room(string name)
             : this(name, GenerateDefaultDescription(name))
         { }
 

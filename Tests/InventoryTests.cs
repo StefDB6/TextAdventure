@@ -41,5 +41,28 @@ namespace Tests
             Assert.AreEqual(inventoryList[0].Description, "Opens doors");
             Assert.AreEqual(inventoryList[0].Type, ItemType.Key);
         }
+
+        [TestMethod]
+        public void Add_And_HasItem_Works()
+        {
+            var inventory = new Inventory();
+            var key = new Item("Key", ItemType.Key, "Opens doors");
+
+            inventory.Add(key);
+
+            Assert.IsTrue(inventory.HasItem(ItemType.Key));
+        }
+
+        [TestMethod]
+        public void Remove_Item_Works()
+        {
+            var inventory = new Inventory();
+            var sword = new Item("Sword", ItemType.Sword, "Sharp");
+
+            inventory.Add(sword);
+            inventory.Remove(sword);
+
+            Assert.IsFalse(inventory.HasItem(ItemType.Sword));
+        }
     }
 }

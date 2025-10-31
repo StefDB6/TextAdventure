@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace TestRaiders_TextAdventure.Core.Interfaces
 {
-    public interface IInventory
+    public interface IMonster
     {
-        void Add(IItem item);
-        void Remove(IItem item);
-        bool HasItem(ItemType type);
-        List<IItem> GetAll();
+        string Name { get; }
+        bool IsAlive { get; }
+        void Attack();
+        void Die();
     }
 }
