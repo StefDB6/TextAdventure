@@ -416,3 +416,19 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# -----------------------
+# OS / Editor / IDE
+# -----------------------
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Rider / IntelliJ
+# If you want to share IDE settings, keep them and ignore workspace only.
+.idea/
+# Keep if you choose to share specific IDE settings; otherwise ignore entire .idea directory:
+.idea/*
+!.idea/codeStyles/
+!.idea/inspectionProfiles/
