@@ -64,5 +64,59 @@ namespace Tests
 
             Assert.IsFalse(inventory.HasItem(ItemType.Sword));
         }
+
+        [TestMethod]
+        public void HasItem_False_When_Empty()
+        {
+            var inventory = new Inventory();
+            Assert.IsFalse(inventory.HasItem(ItemType.Key));
+            Assert.IsFalse(inventory.HasItem(ItemType.Sword));
+            Assert.IsFalse(inventory.HasItem(ItemType.Shield));
+        }
+
+        [TestMethod]
+        public void HasItem_Distinguishes_Types()
+        {
+            var inventory = new Inventory();
+            var key = new Item("Key", ItemType.Key);
+            var sword = new Item("Sword", ItemType.Sword);
+            inventory.Add(key);
+            inventory.Add(sword);
+
+            Assert.IsTrue(inventory.HasItem(ItemType.Key));
+            Assert.IsTrue(inventory.HasItem(ItemType.Sword));
+            Assert.IsFalse(inventory.HasItem(ItemType.Shield)); // not added
+        }
+
+        [TestMethod]
+        public void Remove_NonExisting_Is_NoOp()
+        {
+            var inventory = new Inventory();
+            var key = new Item("Key", ItemType.Key);
+
+            // Attempt to remove item not in inventory
+            inventory.Remove(key);
+
+            // Inventory should remain empty, no crash
+            Assert.AreEqual(0, inventory.GetAll().Count);
+        }
+
+        [TestMethod]
+        public void GetAll_Preserves_InsertionOrder()
+        {
+            var inventory = new Inventory();
+            var key = new Item("Key", ItemType.Key);
+            var sword = new Item("Sword", ItemType.Sword);
+            var shield = new Item("Shield", ItemType.Shield);
+
+            inventory.Add(key);
+            inventory.Add(sword);
+            inventory.Add(shield);
+
+            var allItems = inventory.GetAll();
+            Assert.AreEqual(key, allItems[0]);
+            Assert.AreEqual(sword, allItems[1]);
+            Assert.AreEqual(shield, allItems[2]);
+        }
     }
 }
