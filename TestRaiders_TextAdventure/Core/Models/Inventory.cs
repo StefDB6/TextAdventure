@@ -9,23 +9,23 @@ namespace TestRaiders_TextAdventure.Core.Models
 {
     public class Inventory : IInventory
     {
-        private List<IItem> inventory = new();
+        private readonly List<IItem> _items = new();
 
         public void Add(IItem item)
         {
-            inventory.Add(item);
+            _items.Add(item);
         }
         public void Remove(IItem item)
         {
-            throw new NotImplementedException();
+            _items.Remove(item);
         }
-        public IItem HasItem(ItemType item)
+        public bool HasItem(ItemType type)
         {
-            throw new NotImplementedException();
+            return _items.Any(i => i.Type == type);
         }
         public List<IItem> GetAll()
         {
-            return inventory;
+            return _items;
         }
 
 
