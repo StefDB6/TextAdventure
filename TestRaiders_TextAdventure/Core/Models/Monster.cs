@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TestRaiders_TextAdventure.Core.Interfaces;
 
 namespace TestRaiders_TextAdventure.Core.Models
 {
-    public class Monster
+    public class Monster : IMonster
     {
         public string Name { get; }
 

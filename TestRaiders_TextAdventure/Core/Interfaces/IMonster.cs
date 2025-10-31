@@ -10,7 +10,7 @@ namespace TestRaiders_TextAdventure.Core.Interfaces
     {
         string Name { get; }
         bool IsAlive { get; }
-        void Attack();
+        int Attack();
         void Die();
     }
 }
