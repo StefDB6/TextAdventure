@@ -26,11 +26,17 @@ namespace TestRaiders_TextAdventure.Core.Models
         {
             var next = _currentRoom.GetExit(dir);
             if (next == null)
+            {
+                Console.WriteLine("There is no exit here");
                 return;
+            }
 
             // Check if room is locked and player does NOT have a key
             if (next.RequiresKey && !_inventory.HasItem(ItemType.Key))
+            {
+                Console.WriteLine("You need a key to access this room");
                 return;
+            }
 
             // Prevent leaving monster alive
             if (_currentRoom.HasMonster && _currentRoom.MonsterAlive)
@@ -48,7 +54,7 @@ namespace TestRaiders_TextAdventure.Core.Models
 
         public void Look()
         {
-            Console.WriteLine($"You are in: {_currentRoom.Description}");
+            Console.WriteLine($"{_currentRoom.Description}");
 
             var items = _currentRoom.GetItems();
             if (items.Any())

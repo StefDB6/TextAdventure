@@ -8,6 +8,7 @@ namespace TestRaiders_TextAdventure.Core.Models
         //TODO: Remove tight coupling between Game and RoomsManager, now needed for inventory commands
         readonly RoomsManager _roomsManager;
         public bool _running = true;
+        private bool gameOver = false;
 
         public Game(RoomsManager roomsManager)
         {
@@ -53,7 +54,12 @@ namespace TestRaiders_TextAdventure.Core.Models
                         break;
                     }
                 case "take":
-                    _roomsManager.Take(commandArg);
+                    List<IItem> roomItems = (List<IItem>)_roomsManager.CurrentRoom.GetItems();
+                    if (roomItems.Count == 0)
+                    {
+                        break;
+                    }
+                    _roomsManager.Take(roomItems.First().Id);
                     break;
                 case "fight":
                     _roomsManager.Fight();
@@ -66,8 +72,8 @@ namespace TestRaiders_TextAdventure.Core.Models
                     Console.WriteLine("Invalid command! Type 'help' to see a list of commands.");
                     break;
             }
-            Console.WriteLine($"\nPress enter to continue...");
-            Console.ReadLine();
+            //Console.WriteLine($"\nPress enter to continue...");
+            //Console.ReadLine();
             //Console.Clear();
         }
 
@@ -95,6 +101,10 @@ namespace TestRaiders_TextAdventure.Core.Models
                 Console.Write("> ");
                 string command = Console.ReadLine() ?? "";
                 ProcessCommand(command);
+                if (_roomsManager.IsGameOver)
+                {
+                    _running = false;
+                }
             } while (_running);
         }
 

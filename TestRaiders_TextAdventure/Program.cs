@@ -1,4 +1,5 @@
-﻿using TestRaiders_TextAdventure.Core.Models;
+﻿using TestRaiders_TextAdventure.Core.Interfaces;
+using TestRaiders_TextAdventure.Core.Models;
 
 namespace TestRaiders_TextAdventure
 {
@@ -6,18 +7,22 @@ namespace TestRaiders_TextAdventure
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello, World!");
-            Console.WriteLine("Test");
-            Console.WriteLine("item");
 
-            // Just for testing, final program should only have bottom 2 lines here, maybe only last
-            Room startRoom = new("startRoom");
-            Room northroom = new("northRoom");
-            Inventory inventory = new();
-            RoomsManager manager = new(startRoom, inventory);
+            var services = new ServiceCollection();
+            GameSetup.RegisterDependencies(services);
 
-            Game game = new(manager);
+            // 1) Initialise the world of the game
+            var roomsManager = GameSetup.InitializeWorld();
+
+            // 2) Create the game with that world
+            var game = new Game(roomsManager);
+
+
+            // 3) Start the game loop
+            Console.WriteLine("Welcome to TestRaiders! Type 'help' for commands.");
             game.Start();
+
+            Console.WriteLine("Game exited. Press any key to close...");
         }
     }
 }

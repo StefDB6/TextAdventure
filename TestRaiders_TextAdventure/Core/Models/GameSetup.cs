@@ -9,7 +9,7 @@ namespace TestRaiders_TextAdventure.Core.Models
 {
     public class GameSetup
     {
-    
+
         public static RoomsManager InitializeWorld()
         {
             IInventory inventory = new Inventory();
@@ -52,8 +52,6 @@ namespace TestRaiders_TextAdventure.Core.Models
             // Register abstractions to concrete implementations (singleton-style for simplicity)
             services.AddSingleton<IRoomsManager, RoomsManager>();
             services.AddSingleton<IInventory, Inventory>();
-
-           
         }
     }
 }
