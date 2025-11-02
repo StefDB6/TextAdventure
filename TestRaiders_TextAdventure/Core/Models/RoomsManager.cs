@@ -10,7 +10,7 @@ namespace TestRaiders_TextAdventure.Core.Models
     public class RoomsManager : IRoomsManager
     {
         private IRoom _currentRoom;
-        private readonly IInventory _inventory;
+        public readonly IInventory _inventory;
 
         public IRoom CurrentRoom => _currentRoom;
 
