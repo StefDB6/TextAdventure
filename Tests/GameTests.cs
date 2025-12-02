@@ -8,19 +8,19 @@ namespace Tests
     [TestClass]
     public class GameTests
     {
-        private Room _startRoomMock;
-        private Room _northRoomMock;
-        private Inventory _inventoryMock;
+        private Mock<IRoom> _startRoomMock;
+        private Mock<IRoom> _northRoomMock;
+        private Mock<IInventory> _inventoryMock;
         private RoomsManager _roomsManager;
         private Game _game;
 
         [TestInitialize]
         public void Setup()
         {
-            _startRoomMock = new("Starter Room");
-            _northRoomMock = new("North Room");
+            _startRoomMock = new();
+            _northRoomMock = new();
             _inventoryMock = new();
-            _roomsManager = new RoomsManager(_startRoomMock, _inventoryMock);
+            _roomsManager = new RoomsManager(_startRoomMock.Object, _inventoryMock.Object);
 
             _game = new Game(_roomsManager);
         }
@@ -39,11 +39,11 @@ namespace Tests
         }
 
         [DataTestMethod]
-        [DataRow("n", Direction.North)]
-        [DataRow("e", Direction.East)]
-        [DataRow("s", Direction.South)]
-        [DataRow("w", Direction.West)]
-        public void DirectionString_Gets_Converted_Correctly(string directionStr, Direction correctDirection)
+        [DataRow(Direction.North, "n")]
+        [DataRow(Direction.East, "e")]
+        [DataRow(Direction.South, "s")]
+        [DataRow(Direction.West, "w")]
+        public void DirectionString_Gets_Converted_Correctly(Direction correctDirection, string directionStr)
         {
             Direction? direction = _game.GetDirectionFromString(directionStr);
             Assert.AreEqual(correctDirection, direction);

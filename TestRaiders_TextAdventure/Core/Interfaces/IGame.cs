@@ -3,9 +3,12 @@
     internal interface IGame
     {
         void Start();
-        void ProcessCommand(string command);
-        void ShowHelp();
         void Quit();
-
+        void ProcessCommand(string command);
+        string ShowHelp();
+        string ShowInventory();
+        string Move(string dir);
+        string TakeItem();
+        Direction? GetDirectionFromString(string input);
     }
 }
