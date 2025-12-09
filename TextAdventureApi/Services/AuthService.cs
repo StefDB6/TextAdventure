@@ -1,24 +1,32 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using TextAdventureApi.Data;
 using TextAdventureApi.Dtos;
 using TextAdventureApi.Models;
+using TextAdventureApi.Options;
 using TextAdventureApi.Security;
 
 namespace TextAdventureApi.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly List<User> _users = new();
+        private readonly TextAdventureDbContext _db;
+        private readonly JwtOptions _jwtOptions;
 
-        // simple secret voor schoolproject
-        private const string JwtSecretKey = "THIS_IS_A_DEMO_SECRET_KEY_CHANGE_ME";
-        private const string JwtIssuer = "TextAdventureApi";
-        private const string JwtAudience = "TextAdventureGame";
+        public AuthService(TextAdventureDbContext db, IOptions<JwtOptions> jwtOptions)
+        {
+            _db = db;
+            _jwtOptions = jwtOptions.Value;
+        }
 
         public bool UsernameExists(string username)
-            => _users.Any(u => u.Username == username);
+        {
+            return _db.Users.Any(u => u.Username == username);
+        }
 
         public User Register(RegisterRequest request)
         {
@@ -32,7 +40,9 @@ namespace TextAdventureApi.Services
                 Role = request.Role
             };
 
-            _users.Add(user);
+            _db.Users.Add(user);
+            _db.SaveChanges();
+
             return user;
         }
 
@@ -41,7 +51,7 @@ namespace TextAdventureApi.Services
             error = null;
             lockedOut = false;
 
-            var user = _users.SingleOrDefault(u => u.Username == request.Username);
+            var user = _db.Users.SingleOrDefault(u => u.Username == request.Username);
 
             if (user == null)
             {
@@ -57,6 +67,7 @@ namespace TextAdventureApi.Services
             }
 
             var hash = Sha256Hasher.Hash(request.Password);
+
             if (hash != user.PasswordHash)
             {
                 user.FailedLoginAttempts++;
@@ -72,12 +83,14 @@ namespace TextAdventureApi.Services
                     error = "Invalid username or password.";
                 }
 
+                _db.SaveChanges();
                 return null;
             }
 
             // Succes: teller resetten
             user.FailedLoginAttempts = 0;
             user.IsLockedOut = false;
+            _db.SaveChanges();
 
             var token = GenerateJwt(user);
 
@@ -90,7 +103,7 @@ namespace TextAdventureApi.Services
 
         private string GenerateJwt(User user)
         {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JwtSecretKey));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.Key));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
@@ -100,12 +113,11 @@ namespace TextAdventureApi.Services
             };
 
             var token = new JwtSecurityToken(
-                issuer: JwtIssuer,
-                audience: JwtAudience,
+                issuer: _jwtOptions.Issuer,
+                audience: _jwtOptions.Audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddHours(1),
-                signingCredentials: creds
-            );
+                expires: DateTime.UtcNow.AddMinutes(10),
+                signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }

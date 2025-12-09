@@ -7,7 +7,7 @@
         public string PasswordHash { get; set; } = default!;
         public Role Role { get; set; }
 
-        // Login / lockout fields
+        // Login / lockout
         public int FailedLoginAttempts { get; set; } = 0;
         public bool IsLockedOut { get; set; } = false;
     }
