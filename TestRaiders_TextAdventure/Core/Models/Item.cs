@@ -1,22 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TestRaiders_TextAdventure.Core.Interfaces;
+﻿using TestRaiders_TextAdventure.Core.Interfaces;
 
 namespace TestRaiders_TextAdventure.Core.Models
 {
     public class Item : IItem
     {
         private static int _maxId = 0; // internal counter to create unique IDs
-        public string Id { get;}
+        public string Id { get; }
         public string Name { get; set; }
         public string Description { get; set; }
         public ItemType Type { get; private set; }
 
         // creates a new item with an automatic ID
-        public Item(string name, ItemType type, string description)
+        public Item(string name, ItemType type, string? description)
         {
             _maxId++;
             Id = $"item_{_maxId}";
@@ -31,9 +26,9 @@ namespace TestRaiders_TextAdventure.Core.Models
 
         // additional constructor: creates a new item with only a name.
         // calls the main constructor with an automatically generated description.
-        public Item(string name,ItemType type) : this(name,type, "")
+        public Item(string name, ItemType type) : this(name, type, null)
         {
-            
+
         }
 
         // Genereert een standaardbeschrijving wanneer er geen description is opgegeven.

@@ -1,9 +1,4 @@
 ﻿using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TestRaiders_TextAdventure;
 using TestRaiders_TextAdventure.Core.Interfaces;
 using TestRaiders_TextAdventure.Core.Models;
@@ -13,7 +8,7 @@ namespace Tests
     [TestClass]
     public class RoomsManagerTests
     {
-        
+
         private Mock<IRoom> _startRoomMock;
         private Mock<IRoom> _northRoomMock;
         private Mock<IInventory> _inventoryMock;
@@ -27,7 +22,7 @@ namespace Tests
             _inventoryMock = new Mock<IInventory>();
 
             // When moving north, return the next room
-            _startRoomMock.Setup(r => r.GetExit(Direction.North)).Returns(_northRoomMock.Object);
+            _startRoomMock.Setup(room => room.GetExit(Direction.North)).Returns(_northRoomMock.Object);
 
             _manager = new RoomsManager(_startRoomMock.Object, _inventoryMock.Object);
         }
@@ -59,9 +54,9 @@ namespace Tests
         {
             // Arrange
             var deadlyRoomMock = new Mock<IRoom>();
-            deadlyRoomMock.Setup(r => r.IsDeadly).Returns(true);
+            deadlyRoomMock.Setup(room => room.IsDeadly).Returns(true);
 
-            _startRoomMock.Setup(r => r.GetExit(Direction.North))
+            _startRoomMock.Setup(room => room.GetExit(Direction.North))
                           .Returns(deadlyRoomMock.Object);
 
             // Act
@@ -77,12 +72,12 @@ namespace Tests
         {
             // Arrange
             var lockedRoomMock = new Mock<IRoom>();
-            lockedRoomMock.Setup(r => r.RequiresKey).Returns(true);
-            _startRoomMock.Setup(r => r.GetExit(Direction.North))
+            lockedRoomMock.Setup(room => room.RequiresKey).Returns(true);
+            _startRoomMock.Setup(room => room.GetExit(Direction.North))
                           .Returns(lockedRoomMock.Object);
 
             // Player does NOT have a key
-            _inventoryMock.Setup(i => i.HasItem(ItemType.Key)).Returns(false);
+            _inventoryMock.Setup(inv => inv.HasItem(ItemType.Key)).Returns(false);
 
             var initialRoom = _startRoomMock.Object;
 
@@ -101,13 +96,13 @@ namespace Tests
         {
             // Arrange
             var lockedRoomMock = new Mock<IRoom>();
-            lockedRoomMock.Setup(r => r.RequiresKey).Returns(true);
+            lockedRoomMock.Setup(room => room.RequiresKey).Returns(true);
 
-            _startRoomMock.Setup(r => r.GetExit(Direction.North))
+            _startRoomMock.Setup(room => room.GetExit(Direction.North))
                           .Returns(lockedRoomMock.Object);
 
             // Player has a key this time
-            _inventoryMock.Setup(i => i.HasItem(ItemType.Key)).Returns(true);
+            _inventoryMock.Setup(inv => inv.HasItem(ItemType.Key)).Returns(true);
 
             // Act
             _manager.Go(Direction.North);
@@ -124,12 +119,12 @@ namespace Tests
         {
             // Arrange
             var monsterRoomMock = new Mock<IRoom>();
-            monsterRoomMock.Setup(r => r.HasMonster).Returns(true);
-            monsterRoomMock.Setup(r => r.MonsterAlive).Returns(true);
+            monsterRoomMock.Setup(room => room.HasMonster).Returns(true);
+            monsterRoomMock.Setup(room => room.MonsterAlive).Returns(true);
 
             var nextRoomMock = new Mock<IRoom>();
 
-            monsterRoomMock.Setup(r => r.GetExit(Direction.North))
+            monsterRoomMock.Setup(room => room.GetExit(Direction.North))
                            .Returns(nextRoomMock.Object);
 
             // Place the player in the monster room
@@ -144,33 +139,15 @@ namespace Tests
         }
 
         [TestMethod]
-        public void Fight_InMonsterRoom_Sets_MonsterAlive_False()
-        {
-            // Arrange
-            var monsterRoomMock = new Mock<IRoom>();
-            monsterRoomMock.Setup(r => r.HasMonster).Returns(true);
-            monsterRoomMock.SetupProperty(r => r.MonsterAlive, true);
-
-            _manager = new RoomsManager(monsterRoomMock.Object, _inventoryMock.Object);
-
-            // Act
-            _manager.Fight();
-
-            // Assert
-            Assert.IsFalse(monsterRoomMock.Object.MonsterAlive,
-                "After fighting, the monster should be dead.");
-        }
-
-        [TestMethod]
         public void Go_FromMonsterRoom_AfterFight_AllowsLeavingSafely()
         {
             // Arrange
             var nextRoomMock = new Mock<IRoom>();
 
             var monsterRoomMock = new Mock<IRoom>();
-            monsterRoomMock.Setup(r => r.HasMonster).Returns(true);
-            monsterRoomMock.SetupProperty(r => r.MonsterAlive, false); // monster is already dead
-            monsterRoomMock.Setup(r => r.GetExit(Direction.North)).Returns(nextRoomMock.Object);
+            monsterRoomMock.Setup(room => room.HasMonster).Returns(true);
+            monsterRoomMock.SetupProperty(room => room.MonsterAlive, false); // monster is already dead
+            monsterRoomMock.Setup(room => room.GetExit(Direction.North)).Returns(nextRoomMock.Object);
 
             _manager = new RoomsManager(monsterRoomMock.Object, _inventoryMock.Object);
 
@@ -185,12 +162,146 @@ namespace Tests
         }
 
         [TestMethod]
+        public void Look_Shows_Room_Description()
+        {
+            // Arrange
+            var roomMock = new Mock<IRoom>();
+            roomMock.Setup(room => room.Description).Returns("A dark room");
+
+            _manager = new RoomsManager(roomMock.Object, _inventoryMock.Object);
+
+            // Act
+            string output = _manager.Look();
+
+            // Assert
+            StringAssert.Contains(output, "A dark room");
+        }
+
+        [TestMethod]
+        public void Look_Shows_Room_Items()
+        {
+            // Arrange
+            var sword = new Item("Sword of Destiny", ItemType.Sword, "A sharp blade");
+            var roomMock = new Mock<IRoom>();
+            roomMock.Setup(room => room.GetItems()).Returns(new List<IItem> { sword });
+
+            _manager = new RoomsManager(roomMock.Object, _inventoryMock.Object);
+
+            // Act
+            string output = _manager.Look();
+
+            // Assert
+            StringAssert.Contains(output, sword.Name);
+            StringAssert.Contains(output, sword.Description);
+        }
+
+        [DataTestMethod]
+        [DataRow(Direction.North)]
+        [DataRow(Direction.East)]
+        [DataRow(Direction.South)]
+        [DataRow(Direction.West)]
+        public void Look_Shows_Room_Exits(Direction dir)
+        {
+            // Arrange
+            var roomMock = new Mock<IRoom>();
+            roomMock.Setup(room => room.GetExit(dir)).Returns(new Mock<IRoom>().Object);
+
+            _manager = new RoomsManager(roomMock.Object, _inventoryMock.Object);
+
+            // Act
+            string output = _manager.Look();
+
+            // Assert
+            StringAssert.Contains(output, dir.ToString());
+        }
+
+        [TestMethod]
+        public void Look_Shows_No_Items_In_Room()
+        {
+            var roomMock = new Mock<IRoom>();
+
+            _manager = new RoomsManager(roomMock.Object, _inventoryMock.Object);
+
+            string output = _manager.Look();
+
+            StringAssert.Contains(output, "No items in this room.", "No items were added");
+        }
+
+        [TestMethod]
+        public void Look_Shows_No_Exits_Available()
+        {
+            var roomMock = new Mock<IRoom>();
+
+            _manager = new RoomsManager(roomMock.Object, _inventoryMock.Object);
+
+            string output = _manager.Look();
+
+            StringAssert.Contains(output, "No exits available.", "No exits were added");
+        }
+
+        [TestMethod]
+        public void Take_Item_RemovesFromRoom_AndAddsToInventory()
+        {
+            // Arrange
+            var sword = new Item("Sword", ItemType.Sword, "A sharp blade");
+            var roomMock = new Mock<IRoom>();
+            roomMock.Setup(room => room.GetItems()).Returns(new List<IItem> { sword });
+            roomMock.Setup(room => room.TakeItem(sword.Id)).Returns(sword);
+
+            _manager = new RoomsManager(roomMock.Object, _inventoryMock.Object);
+
+            // Act
+            _manager.Take(sword.Id);
+
+            // Assert
+            _inventoryMock.Verify(inv => inv.Add(sword), Times.Once,
+                "Item should be added to the inventory");
+            roomMock.Verify(room => room.TakeItem(sword.Id), Times.Once,
+                "Item should be removed from the room");
+        }
+
+        [TestMethod]
+        public void Take_NonExistentItem_DoesNothing()
+        {
+            // Arrange
+            var roomMock = new Mock<IRoom>();
+            roomMock.Setup(room => room.TakeItem(It.IsAny<string>())).Returns((IItem?)null);
+
+            _manager = new RoomsManager(roomMock.Object, _inventoryMock.Object);
+
+            // Act
+            _manager.Take("nonexistent_item");
+
+            // Assert
+            _inventoryMock.Verify(inv => inv.Add(It.IsAny<IItem>()), Times.Never,
+                "No item should be added to inventory");
+        }
+
+        [TestMethod]
+        public void Fight_InMonsterRoom_Sets_MonsterAlive_False()
+        {
+            // Arrange
+            var monsterRoomMock = new Mock<IRoom>();
+            monsterRoomMock.Setup(room => room.HasMonster).Returns(true);
+            monsterRoomMock.SetupProperty(room => room.MonsterAlive, true);
+
+            _manager = new RoomsManager(monsterRoomMock.Object, _inventoryMock.Object);
+
+            // Act
+            _manager.Fight();
+
+            // Assert
+            Assert.IsFalse(monsterRoomMock.Object.MonsterAlive,
+                "After fighting, the monster should be dead.");
+        }
+
+        [TestMethod]
         public void Fight_InRoomWithoutMonster_DoesNothing()
         {
             // Arrange
             var emptyRoomMock = new Mock<IRoom>();
-            emptyRoomMock.Setup(r => r.HasMonster).Returns(false);
-            emptyRoomMock.SetupProperty(r => r.MonsterAlive, false);
+            emptyRoomMock.Setup(room => room.HasMonster).Returns(false);
+            emptyRoomMock.SetupProperty(room => room.MonsterAlive, false);
 
             _manager = new RoomsManager(emptyRoomMock.Object, _inventoryMock.Object);
 
@@ -205,118 +316,35 @@ namespace Tests
         }
 
         [TestMethod]
-        public void Take_Item_RemovesFromRoom_AndAddsToInventory()
-        {
-            // Arrange
-            var sword = new Item("Sword", ItemType.Sword, "A sharp blade");
-            var roomMock = new Mock<IRoom>();
-            roomMock.Setup(r => r.GetItems()).Returns(new List<IItem> { sword });
-            roomMock.Setup(r => r.TakeItem(sword.Id)).Returns(sword);
-
-            _manager = new RoomsManager(roomMock.Object, _inventoryMock.Object);
-
-            // Act
-            _manager.Take(sword.Id);
-
-            // Assert
-            _inventoryMock.Verify(i => i.Add(sword), Times.Once,
-                "Item should be added to the inventory");
-            roomMock.Verify(r => r.TakeItem(sword.Id), Times.Once,
-                "Item should be removed from the room");
-        }
-
-        [TestMethod]
-        public void Take_NonExistentItem_DoesNothing()
-        {
-            // Arrange
-            var roomMock = new Mock<IRoom>();
-            roomMock.Setup(r => r.TakeItem(It.IsAny<string>())).Returns((IItem?)null);
-
-            _manager = new RoomsManager(roomMock.Object, _inventoryMock.Object);
-
-            // Act
-            _manager.Take("nonexistent_item");
-
-            // Assert
-            _inventoryMock.Verify(i => i.Add(It.IsAny<IItem>()), Times.Never,
-                "No item should be added to inventory");
-        }
-
-        [TestMethod]
-        public void Look_ShowsRoomDescriptionItemsAndExits()
-        {
-            // Arrange
-            var sword = new Item("Sword", ItemType.Sword, "A sharp blade");
-            var roomMock = new Mock<IRoom>();
-            roomMock.Setup(r => r.Description).Returns("A dark room");
-            roomMock.Setup(r => r.GetItems()).Returns(new List<IItem> { sword });
-            roomMock.Setup(r => r.GetExit(Direction.North)).Returns(new Mock<IRoom>().Object);
-            roomMock.Setup(r => r.GetExit(Direction.South)).Returns((IRoom?)null);
-
-            _manager = new RoomsManager(roomMock.Object, _inventoryMock.Object);
-
-            using var sw = new StringWriter();
-            Console.SetOut(sw);
-
-            // Act
-            _manager.Look();
-            var output = sw.ToString();
-
-            // Assert
-            StringAssert.Contains(output, "A dark room");
-            StringAssert.Contains(output, "Sword");
-            StringAssert.Contains(output, "North");
-            Assert.IsFalse(output.Contains("South"), "South should not appear in the exits.");
-        }
-
-        [TestMethod]
-        public void HasWon_InDoorRoomWithKey_ReturnsTrue()
-        {
-            // Arrange
-            var doorRoomMock = new Mock<IRoom>();
-            doorRoomMock.Setup(r => r.RequiresKey).Returns(true);
-            _inventoryMock.Setup(i => i.HasItem(ItemType.Key)).Returns(true);
-
-            _manager = new RoomsManager(doorRoomMock.Object, _inventoryMock.Object);
-
-            // Act
-            bool won = _manager.HasWon();
-
-            // Assert
-            Assert.IsTrue(won, "Player should win when entering the door room with the key.");
-        }
-
-        [TestMethod]
-        public void HasWon_InDoorRoomWithoutKey_ReturnsFalse()
-        {
-            // Arrange
-            var doorRoomMock = new Mock<IRoom>();
-            doorRoomMock.Setup(r => r.RequiresKey).Returns(true);
-            _inventoryMock.Setup(i => i.HasItem(ItemType.Key)).Returns(false);
-
-            _manager = new RoomsManager(doorRoomMock.Object, _inventoryMock.Object);
-
-            // Act
-            bool won = _manager.HasWon();
-
-            // Assert
-            Assert.IsFalse(won, "Player should not win if they are in the door room without the key.");
-        }
-
-        [TestMethod]
         public void HasWon_InNormalRoom_ReturnsFalse()
         {
             // Arrange
             var normalRoomMock = new Mock<IRoom>();
-            normalRoomMock.Setup(r => r.RequiresKey).Returns(false);
+            normalRoomMock.Setup(room => room.WinningRoom).Returns(false);
 
             _manager = new RoomsManager(normalRoomMock.Object, _inventoryMock.Object);
 
             // Act
-            bool won = _manager.HasWon();
+            bool won = _manager.CheckWin();
 
             // Assert
             Assert.IsFalse(won, "Player should not win in a normal room.");
+        }
+
+        [TestMethod]
+        public void HasWon_InWinningRoom_ReturnsTrue()
+        {
+            // Arrange
+            var winningRoomMock = new Mock<IRoom>();
+            winningRoomMock.Setup(room => room.WinningRoom).Returns(true);
+
+            _manager = new RoomsManager(winningRoomMock.Object, _inventoryMock.Object);
+
+            // Act
+            bool won = _manager.CheckWin();
+
+            // Assert
+            Assert.IsTrue(won, "Player should win in the winning room.");
         }
 
     }

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TestRaiders_TextAdventure.Core.Interfaces;
+﻿using TestRaiders_TextAdventure.Core.Interfaces;
 
 namespace TestRaiders_TextAdventure.Core.Models
 {
@@ -14,10 +9,16 @@ namespace TestRaiders_TextAdventure.Core.Models
         public void Add(IItem item)
         {
             _items.Add(item);
+            return;
         }
         public void Remove(IItem item)
         {
-            _items.Remove(item);
+            if (_items.Contains(item))
+            {
+                _items.Remove(item);
+                return;
+            }
+            return;
         }
         public bool HasItem(ItemType type)
         {
@@ -27,8 +28,5 @@ namespace TestRaiders_TextAdventure.Core.Models
         {
             return _items;
         }
-
-
-
     }
 }
