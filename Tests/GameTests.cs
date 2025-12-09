@@ -34,8 +34,6 @@ namespace Tests
         [TestMethod]
         public void Quit_Works()
         {
-            // New game var because global _game var doesnt update running status
-            //Game game = new(_roomsManager);
             _game.Quit();
             Assert.IsFalse(_game.Running);
         }
@@ -60,14 +58,49 @@ namespace Tests
         public void ProcessCommand_Returns_Correct_Output(string command, string expectedOutput)
         {
             string output = _game.ProcessCommand(command);
-            //Assert.AreEqual(expectedOutput, output);
             Assert.IsTrue(output.Contains(expectedOutput));
         }
 
         [TestMethod]
-        public void Move_Returns_Invalid_Direction_When_Direction_Is_Null()
+        public void Empty_Inventory_Shows_No_Items()
         {
-            Assert.AreEqual("Invalid direction! (n/e/s/w)", _game.Move(null));
+            string inventory = _game.ShowInventory();
+            StringAssert.Contains(inventory, "You have no items in your inventory");
+        }
+
+        [TestMethod]
+        public void ShowInventory_Shows_Item()
+        {
+            Item item = new("Sword of Destiny", ItemType.Sword, "Kills monsters");
+            _inventoryMock.Setup(inv => inv.GetAll()).Returns([item]);
+
+            string inventory = _game.ShowInventory();
+            StringAssert.Contains(inventory, item.ToString());
+        }
+
+        [TestMethod]
+        public void ShowInventory_Shows_Multiple_Items()
+        {
+            Item sword = new("Sword of Destiny", ItemType.Sword, "Kills monsters");
+            Item key = new("Key of Destiny", ItemType.Key, "Opens the door to success");
+            Item shield = new("Thorn Shield", ItemType.Shield, "Defends your hopes");
+
+            _inventoryMock.Setup(inv => inv.GetAll()).Returns([sword, key, shield]);
+
+            string inventory = _game.ShowInventory();
+
+            StringAssert.Contains(inventory, sword.ToString());
+            StringAssert.Contains(inventory, key.ToString());
+            StringAssert.Contains(inventory, shield.ToString());
+        }
+
+        [DataTestMethod]
+        [DataRow("fake")]
+        [DataRow("")]
+        // No null test required because Start() loop handles that
+        public void Move_Returns_Invalid_Direction_When_Input_Invalid(string dir)
+        {
+            Assert.AreEqual("Invalid direction! (n/e/s/w)", _game.Move(dir));
         }
 
         [DataTestMethod]
