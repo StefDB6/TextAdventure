@@ -22,7 +22,14 @@ namespace TestRaiders_TextAdventure.Core.Models
         : this(name, GenerateDefaultDescription(name))
         { }
 
-        public Room(string name, string description, bool isDeadly = false, bool requiresKey = false, bool hasMonster = false, bool winningRoom = false)
+        public Room(
+            string name,
+            string description,
+            bool isDeadly = false,
+            bool requiresKey = false,
+            bool hasMonster = false,
+            bool winningRoom = false
+        )
         {
             Name = name;
             Description = description;

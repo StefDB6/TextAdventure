@@ -114,7 +114,7 @@ namespace TestRaiders_TextAdventure.Core.Models
             }
             else
             {
-                return _roomsManager.Go((Direction)direction);
+                return _roomsManager.Go(direction.Value);
             }
         }
 

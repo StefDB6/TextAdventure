@@ -1,6 +1,5 @@
 ﻿using TestRaiders_TextAdventure.Core.Interfaces;
 
-
 namespace TestRaiders_TextAdventure.Core.Models
 {
     public class ServiceCollection : IServiceCollection

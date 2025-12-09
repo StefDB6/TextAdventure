@@ -46,7 +46,7 @@ namespace TestRaiders_TextAdventure.Core.Models
 
         public static void RegisterDependencies(ServiceCollection services)
         {
-            // Register abstractions to concrete implementations (singleton-style for simplicity)
+            // Register abstractions to concrete implementations
             services.AddSingleton<IRoomsManager, RoomsManager>();
             services.AddSingleton<IInventory, Inventory>();
         }
