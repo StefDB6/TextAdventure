@@ -1,5 +1,4 @@
-﻿using TestRaiders_TextAdventure.Core.Interfaces;
-using TestRaiders_TextAdventure.Core.Models;
+﻿using TestRaiders_TextAdventure.Core.Models;
 
 namespace TestRaiders_TextAdventure
 {
@@ -12,17 +11,13 @@ namespace TestRaiders_TextAdventure
             GameSetup.RegisterDependencies(services);
 
             // 1) Initialise the world of the game
-            var roomsManager = GameSetup.InitializeWorld();
+            RoomsManager roomsManager = GameSetup.InitializeWorld();
 
             // 2) Create the game with that world
-            var game = new Game(roomsManager);
-
+            Game game = new(roomsManager);
 
             // 3) Start the game loop
-            Console.WriteLine("Welcome to TestRaiders! Type 'help' for commands.");
             game.Start();
-
-            Console.WriteLine("Game exited. Press any key to close...");
         }
     }
 }

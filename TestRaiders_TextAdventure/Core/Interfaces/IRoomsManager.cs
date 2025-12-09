@@ -5,8 +5,8 @@
         string Go(Direction direction);
         string Look();
         string Take(string itemId);
-        void Fight();
-        bool HasWon();
+        string Fight();
+        bool CheckWin();
         bool IsGameOver { get; }
     }
 }

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TestRaiders_TextAdventure;
+﻿using TestRaiders_TextAdventure;
 using TestRaiders_TextAdventure.Core.Interfaces;
 using TestRaiders_TextAdventure.Core.Models;
 
@@ -21,7 +16,7 @@ namespace Tests
         }
 
         [TestMethod]
-        // Checks if the constructor correctly sets properties
+        // Checks if the constructor correctly sets properties and defaults
         public void Constructor_Sets_Properties_Correctly()
         {
             Assert.AreEqual("Hall", _room.Name);
@@ -29,57 +24,99 @@ namespace Tests
             Assert.IsFalse(_room.IsDeadly);
             Assert.IsFalse(_room.RequiresKey);
             Assert.IsFalse(_room.HasMonster);
+            Assert.IsFalse(_room.WinningRoom);
         }
 
-		[TestMethod]
-		public void AddExit_Stores_Room_In_Exits()
-		{
-			var nextRoom = new Room("Library", "Full of books.");
-			_room.AddExit(Direction.North, nextRoom);
+        [TestMethod]
+        public void AddExit_Stores_Room_In_Exits()
+        {
+            Room nextRoom = new("Library", "Full of books.");
+            _room.AddExit(Direction.North, nextRoom);
 
-			Assert.IsTrue(_room.Exits.ContainsKey(Direction.North));
-			Assert.AreSame(nextRoom, _room.Exits[Direction.North]);
-		}
+            Assert.IsTrue(_room.Exits.ContainsKey(Direction.North));
+            Assert.AreSame(nextRoom, _room.Exits[Direction.North]);
+        }
 
-		[TestMethod]
-		public void GetExit_Returns_Correct_Room()
-		{
-			var nextRoom = new Room("Library", "Full of books.");
-			_room.AddExit(Direction.East, nextRoom);
+        [DataTestMethod]
+        [DataRow(Direction.North)]
+        [DataRow(Direction.East)]
+        [DataRow(Direction.South)]
+        [DataRow(Direction.West)]
+        public void GetExit_Returns_Correct_Room(Direction dir)
+        {
+            Room nextRoom = new("Library", "Full of books.");
+            _room.AddExit(dir, nextRoom);
 
-			var result = _room.GetExit(Direction.East);
+            IRoom? result = _room.GetExit(dir);
 
-			Assert.AreSame(nextRoom, result);
-		}
+            Assert.AreSame(nextRoom, result);
+        }
 
-		[TestMethod]
-		public void GetExit_Returns_Null_When_No_Exit_Exists()
-		{
-			var result = _room.GetExit(Direction.West);
-			Assert.IsNull(result);
-		}
+        [DataTestMethod]
+        [DataRow(Direction.North)]
+        [DataRow(Direction.East)]
+        [DataRow(Direction.South)]
+        [DataRow(Direction.West)]
+        public void GetExit_Returns_Null_When_No_Exit_Exists(Direction dir)
+        {
+            IRoom? room = _room.GetExit(dir);
+            Assert.IsNull(room);
+        }
 
-		[TestMethod]
+        [DataTestMethod]
+        [DataRow(Direction.North, Direction.South)]
+        [DataRow(Direction.East, Direction.West)]
+        [DataRow(Direction.South, Direction.North)]
+        [DataRow(Direction.West, Direction.East)]
+        public void GetExit_Returns_Null_When_Specific_Exit_Doesnt_Exist(Direction dirRoom, Direction dirNone)
+        {
+            Room nextRoom = new("Library", "Full of books.");
+            _room.AddExit(dirRoom, nextRoom);
+
+            IRoom? result = _room.GetExit(dirNone);
+
+            Assert.IsNull(result);
+        }
+
+        [TestMethod]
         // Tests if items can be added to the room
         public void AddItem_Adds_Item_To_Room()
         {
-            var item = new Item("Key", ItemType.Key);
+            Item item = new("Key", ItemType.Key);
             _room.AddItem(item);
 
-            var items = _room.GetItems().ToList();
+            List<IItem> items = _room.GetItems().ToList();
 
             Assert.AreEqual(1, items.Count);
             Assert.AreEqual("Key", items[0].Name);
         }
 
         [TestMethod]
+        public void AddItem_Can_Add_Multiple_Items()
+        {
+            //Arrange
+            Item key1 = new("Key of Hope", ItemType.Key);
+            Item key2 = new("Key of Despair", ItemType.Key);
+            Item sword = new("Sword of Destiny", ItemType.Sword);
+
+            //Act
+            _room.AddItem(key1);
+            _room.AddItem(key2);
+            _room.AddItem(sword);
+            List<IItem> items = _room.GetItems().ToList();
+
+            //Assert
+            Assert.AreEqual(3, items.Count);
+        }
+
+        [TestMethod]
         // Tests if TakeItem removes and returns the correct item
         public void TakeItem_Removes_And_Returns_Item()
         {
-            var item = new Item("Sword", ItemType.Sword);
+            Item item = new("Sword", ItemType.Sword);
             _room.AddItem(item);
 
-            var result = _room.TakeItem(item.Id);
+            IItem? result = _room.TakeItem(item.Id);
 
             Assert.AreEqual(item, result);
             Assert.AreEqual(0, _room.GetItems().Count());
@@ -89,8 +126,8 @@ namespace Tests
         // Tests that TakeItem returns null if the item does not exist
         public void TakeItem_Returns_Null_When_Item_Not_Found()
         {
-            var result = _room.TakeItem("does_not_exist");
-            Assert.IsNull(result);
+            IItem? item = _room.TakeItem("does_not_exist");
+            Assert.IsNull(item);
         }
 
         [TestMethod]
@@ -108,11 +145,9 @@ namespace Tests
         // Test that a deadly room is correctly marked as deadly
         public void Room_Can_Be_Deadly()
         {
-            var deadlyRoom = new Room("Trap Room", "Spikes everywhere.", isDeadly: true);
+            Room deadlyRoom = new("Trap Room", "Spikes everywhere.", isDeadly: true);
 
             Assert.IsTrue(deadlyRoom.IsDeadly);
-            Assert.IsFalse(deadlyRoom.RequiresKey);
-            Assert.IsFalse(deadlyRoom.HasMonster);
         }
 
         [TestMethod]
@@ -177,7 +212,7 @@ namespace Tests
         // Tests the static GenerateDefaultDescription helper
         public void GenerateDefaultDescription_Returns_Correct_Format()
         {
-            var result = Room.GenerateDefaultDescription("Hall");
+            string result = Room.GenerateDefaultDescription("Hall");
             Assert.AreEqual("description: Hall.", result);
         }
 
@@ -185,7 +220,7 @@ namespace Tests
         // Tests that the short constructor chains and generates a default description
         public void Constructor_OnlyName_Generates_Default_Description()
         {
-            var room = new Room("Dungeon");
+            Room room = new("Dungeon");
 
             Assert.AreEqual("Dungeon", room.Name);
             Assert.AreEqual("description: Dungeon.", room.Description);
@@ -198,7 +233,7 @@ namespace Tests
         // Tests that the main constructor overrides description properly
         public void Constructor_WithCustomDescription_Does_Not_Use_Default()
         {
-            var room = new Room("Garden", "A calm, open area with flowers.");
+            Room room = new("Garden", "A calm, open area with flowers.");
 
             Assert.AreEqual("Garden", room.Name);
             Assert.AreEqual("A calm, open area with flowers.", room.Description);

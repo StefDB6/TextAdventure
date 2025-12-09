@@ -9,10 +9,16 @@ namespace TestRaiders_TextAdventure.Core.Models
         public void Add(IItem item)
         {
             _items.Add(item);
+            return;
         }
         public void Remove(IItem item)
         {
-            _items.Remove(item);
+            if (_items.Contains(item))
+            {
+                _items.Remove(item);
+                return;
+            }
+            return;
         }
         public bool HasItem(ItemType type)
         {

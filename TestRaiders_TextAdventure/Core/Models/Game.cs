@@ -5,9 +5,8 @@ namespace TestRaiders_TextAdventure.Core.Models
     internal class Game : IGame
     {
         //TODO: Remove tight coupling between Game and RoomsManager, now needed for inventory commands
-        readonly RoomsManager _roomsManager;
-        public bool _running = true;
-        private bool gameOver = false;
+        private readonly RoomsManager _roomsManager;
+        public bool Running = true;
 
         public Game(RoomsManager roomsManager)
         {
@@ -16,23 +15,26 @@ namespace TestRaiders_TextAdventure.Core.Models
 
         public void Start()
         {
-            _running = true;
+            Console.WriteLine("Welcome to TestRaiders! Type 'help' for commands.");
+            Running = true;
+
+            // Main game loop: get command > run functions > show result
             do
             {
                 Console.Write("> ");
                 string command = Console.ReadLine() ?? "";
-                ProcessCommand(command);
-                if (_roomsManager.IsGameOver)
+                Console.WriteLine(ProcessCommand(command));
+                if (_roomsManager.IsGameOver || _roomsManager.CheckWin())
                 {
-                    _running = false;
+                    Running = false;
                 }
-            } while (_running);
+            } while (Running);
 
             Console.WriteLine("Thanks for playing! (press enter to continue)");
             Console.ReadLine();
         }
 
-        public void ProcessCommand(string command)
+        public string ProcessCommand(string command)
         {
             string[] splitInput;
             string commandArg = "";
@@ -42,44 +44,33 @@ namespace TestRaiders_TextAdventure.Core.Models
                 splitInput = command.Split(' ');
                 command = splitInput[0];
                 commandArg = splitInput[1];
-                //Console.WriteLine(commandArg);
             }
 
             switch (command.ToLower())
             {
                 case "help":
-                    Console.WriteLine(ShowHelp());
-                    break;
+                    return ShowHelp();
                 case "look":
-                    Console.WriteLine(_roomsManager.Look());
-                    break;
+                    return _roomsManager.Look();
                 case "inventory":
-                    Console.WriteLine(ShowInventory());
-                    break;
+                    return ShowInventory();
                 case "go":
-                    Console.WriteLine(Move(commandArg));
-                    break;
+                    return Move(commandArg);
                 case "take":
-                    Console.WriteLine(TakeItem());
-                    break;
+                    return _roomsManager.Take(commandArg);
                 case "fight":
-                    _roomsManager.Fight();
-                    break;
+                    return _roomsManager.Fight();
                 case "quit":
                     Quit();
-                    break;
+                    return "Closing...";
                 default:
-                    Console.WriteLine("Invalid command! Type 'help' to see a list of commands.");
-                    break;
+                    return "Invalid command! Type 'help' to see a list of commands.";
             }
-            //Console.WriteLine($"\nPress enter to continue...");
-            //Console.ReadLine();
-            //Console.Clear();
         }
 
         public void Quit()
         {
-            _running = false;
+            Running = false;
         }
 
         public string ShowHelp()
@@ -90,9 +81,9 @@ namespace TestRaiders_TextAdventure.Core.Models
                 "look:\t\tShow current room, exits, items, and inventory",
                 "inventory:\tShow inventory",
                 "go n/e/s/w:\tMove in given direction",
-                "take:\t\tpick up item",
-                "fight:\tstart a fight with a monster",
-                "quit:\t\tstop the game"
+                "take item_id:\tPick up item with its Id",
+                "fight:\tStart a fight with a monster",
+                "quit:\t\tStop the game"
             ];
             // Format list of commands
             return String.Join("\n- ", helpList);
@@ -100,13 +91,17 @@ namespace TestRaiders_TextAdventure.Core.Models
 
         public string ShowInventory()
         {
-            List<string> output =
-            [
-                "Your inventory:",
-            ];
+            List<string> output = ["Your inventory:"];
             List<IItem> inventoryItems = _roomsManager._inventory.GetAll();
+            if (inventoryItems is null)
+            {
+                return "You have no items in your inventory!";
+            }
             foreach (var item in inventoryItems)
-                output.Add($"{item.Name} ({item.Type})");
+            {
+                output.Add(item.ToString());
+            }
+
             return String.Join("\n- ", output);
         }
 
@@ -119,21 +114,8 @@ namespace TestRaiders_TextAdventure.Core.Models
             }
             else
             {
-                //Console.WriteLine($"Going {direction}");
                 return _roomsManager.Go((Direction)direction);
             }
-        }
-
-        public string TakeItem()
-        {
-            List<IItem> roomItems = (List<IItem>)_roomsManager.CurrentRoom.GetItems();
-            string? itemId = null;
-            if (!(roomItems.Count == 0))
-            {
-                itemId = roomItems.First().Id;
-            }
-
-            return _roomsManager.Take(itemId);
         }
 
         public Direction? GetDirectionFromString(string input)

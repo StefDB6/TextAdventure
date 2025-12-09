@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TestRaiders_TextAdventure;
+﻿using TestRaiders_TextAdventure;
 using TestRaiders_TextAdventure.Core.Interfaces;
 using TestRaiders_TextAdventure.Core.Models;
 
@@ -12,111 +7,105 @@ namespace Tests
     [TestClass]
     public class InventoryTests
     {
+        private readonly Inventory _inventory = new();
+
         [TestMethod]
         public void Empty_Inventory_Returns_Empty_List()
         {
-            Inventory inventory = new();
-            var test = inventory.GetAll();
-            Assert.AreEqual(test.Count, 0);
+            List<IItem> items = _inventory.GetAll();
+            Assert.AreEqual(items.Count, 0);
         }
 
         [TestMethod]
         public void AddItem_Adds_One_Item()
         {
-            Inventory inventory = new();
             Item item = new("Key", ItemType.Key);
-            inventory.Add(item);
-            var test = inventory.GetAll();
-            Assert.AreEqual(1, test.Count);
+            _inventory.Add(item);
+            List<IItem> items = _inventory.GetAll();
+            Assert.AreEqual(1, items.Count);
         }
 
         [TestMethod]
         public void AddItem_Adds_Correct_Item()
         {
-            Inventory inventory = new();
             Item item = new("Key to hell", ItemType.Key, "Opens doors");
-            inventory.Add(item);
-            List<IItem> inventoryList = inventory.GetAll();
-            Assert.AreEqual(inventoryList[0].Name, "Key to hell");
-            Assert.AreEqual(inventoryList[0].Description, "Opens doors");
-            Assert.AreEqual(inventoryList[0].Type, ItemType.Key);
+            _inventory.Add(item);
+            List<IItem> items = _inventory.GetAll();
+            Assert.AreEqual(items[0].Name, item.Name);
+            Assert.AreEqual(items[0].Description, item.Description);
+            Assert.AreEqual(items[0].Type, item.Type);
+            Assert.AreEqual(items[0].Id, item.Id);
         }
 
         [TestMethod]
         public void Add_And_HasItem_Works()
         {
-            var inventory = new Inventory();
-            var key = new Item("Key", ItemType.Key, "Opens doors");
+            Item item = new("Key", ItemType.Key, "Opens doors");
 
-            inventory.Add(key);
+            _inventory.Add(item);
 
-            Assert.IsTrue(inventory.HasItem(ItemType.Key));
+            Assert.IsTrue(_inventory.HasItem(ItemType.Key));
         }
 
         [TestMethod]
         public void Remove_Item_Works()
         {
-            var inventory = new Inventory();
-            var sword = new Item("Sword", ItemType.Sword, "Sharp");
+            Item item = new("Sword", ItemType.Sword, "Sharp");
 
-            inventory.Add(sword);
-            inventory.Remove(sword);
+            _inventory.Add(item);
+            _inventory.Remove(item);
 
-            Assert.IsFalse(inventory.HasItem(ItemType.Sword));
+            Assert.IsFalse(_inventory.HasItem(ItemType.Sword));
         }
 
         [TestMethod]
-        public void HasItem_False_When_Empty()
+        public void HasItem_False_When_Inventory_Empty()
         {
-            var inventory = new Inventory();
-            Assert.IsFalse(inventory.HasItem(ItemType.Key));
-            Assert.IsFalse(inventory.HasItem(ItemType.Sword));
-            Assert.IsFalse(inventory.HasItem(ItemType.Shield));
+            Assert.IsFalse(_inventory.HasItem(ItemType.Key));
+            Assert.IsFalse(_inventory.HasItem(ItemType.Sword));
+            Assert.IsFalse(_inventory.HasItem(ItemType.Shield));
         }
 
         [TestMethod]
         public void HasItem_Distinguishes_Types()
         {
-            var inventory = new Inventory();
-            var key = new Item("Key", ItemType.Key);
-            var sword = new Item("Sword", ItemType.Sword);
-            inventory.Add(key);
-            inventory.Add(sword);
+            Item key = new("Key", ItemType.Key);
+            Item sword = new("Sword", ItemType.Sword);
+            _inventory.Add(key);
+            _inventory.Add(sword);
 
-            Assert.IsTrue(inventory.HasItem(ItemType.Key));
-            Assert.IsTrue(inventory.HasItem(ItemType.Sword));
-            Assert.IsFalse(inventory.HasItem(ItemType.Shield)); // not added
+            Assert.IsTrue(_inventory.HasItem(ItemType.Key));
+            Assert.IsTrue(_inventory.HasItem(ItemType.Sword));
+            Assert.IsFalse(_inventory.HasItem(ItemType.Shield));
         }
 
         [TestMethod]
-        public void Remove_NonExisting_Is_NoOp()
+        public void Removing_NonExisting_Item_Does_Nothing()
         {
-            var inventory = new Inventory();
-            var key = new Item("Key", ItemType.Key);
+            Item item = new("Key", ItemType.Key);
 
             // Attempt to remove item not in inventory
-            inventory.Remove(key);
+            _inventory.Remove(item);
 
             // Inventory should remain empty, no crash
-            Assert.AreEqual(0, inventory.GetAll().Count);
+            Assert.AreEqual(0, _inventory.GetAll().Count);
         }
 
         [TestMethod]
-        public void GetAll_Preserves_InsertionOrder()
+        public void Inventory_Preserves_InsertionOrder()
         {
-            var inventory = new Inventory();
-            var key = new Item("Key", ItemType.Key);
-            var sword = new Item("Sword", ItemType.Sword);
-            var shield = new Item("Shield", ItemType.Shield);
+            Item key = new("Key", ItemType.Key);
+            Item sword = new("Sword", ItemType.Sword);
+            Item shield = new("Shield", ItemType.Shield);
 
-            inventory.Add(key);
-            inventory.Add(sword);
-            inventory.Add(shield);
+            _inventory.Add(key);
+            _inventory.Add(sword);
+            _inventory.Add(shield);
 
-            var allItems = inventory.GetAll();
-            Assert.AreEqual(key, allItems[0]);
-            Assert.AreEqual(sword, allItems[1]);
-            Assert.AreEqual(shield, allItems[2]);
+            List<IItem> items = _inventory.GetAll();
+            Assert.AreEqual(key, items[0]);
+            Assert.AreEqual(sword, items[1]);
+            Assert.AreEqual(shield, items[2]);
         }
     }
 }

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TestRaiders_TextAdventure.Core.Interfaces;
+﻿using TestRaiders_TextAdventure.Core.Interfaces;
 
 namespace TestRaiders_TextAdventure.Core.Models
 {
@@ -18,15 +13,16 @@ namespace TestRaiders_TextAdventure.Core.Models
         public bool RequiresKey { get; set; }
         public bool HasMonster { get; set; }
         public bool MonsterAlive { get; set; }
+        public bool WinningRoom { get; }
 
-			// Expose exits for testing (read-only)
-			internal IReadOnlyDictionary<Direction, IRoom> Exits => _exits;
+        // Expose exits for testing (read-only)
+        internal IReadOnlyDictionary<Direction, IRoom> Exits => _exits;
 
-			public Room(string name)
-            : this(name, GenerateDefaultDescription(name))
+        public Room(string name)
+        : this(name, GenerateDefaultDescription(name))
         { }
 
-        public Room(string name, string description, bool isDeadly = false, bool requiresKey = false, bool hasMonster = false)
+        public Room(string name, string description, bool isDeadly = false, bool requiresKey = false, bool hasMonster = false, bool winningRoom = false)
         {
             Name = name;
             Description = description;
@@ -34,6 +30,7 @@ namespace TestRaiders_TextAdventure.Core.Models
             RequiresKey = requiresKey;
             HasMonster = hasMonster;
             MonsterAlive = hasMonster;
+            WinningRoom = winningRoom;
         }
 
         public static string GenerateDefaultDescription(string name)
@@ -63,10 +60,9 @@ namespace TestRaiders_TextAdventure.Core.Models
             return item;
         }
 
-        public IEnumerable<IItem> GetItems()
+        public IList<IItem> GetItems()
         {
             return _items;
         }
     }
 }
-

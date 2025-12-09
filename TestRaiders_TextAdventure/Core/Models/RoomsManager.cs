@@ -19,36 +19,39 @@ namespace TestRaiders_TextAdventure.Core.Models
 
         public string Go(Direction dir)
         {
-            string output = "";
             var next = _currentRoom.GetExit(dir);
-            if (_currentRoom.IsDeadly)
+            if (next == null)
             {
-                // TODO: Deadly rooms only trigger when moving out instead of in
-                output = "You fell in a trap!";
-                IsGameOver = true;
+                return "There is no exit here";
             }
-            else if (next == null)
+            else if (next.IsDeadly)
             {
-                output = "There is no exit here";
+                IsGameOver = true;
+                return "You fell in a trap! Game Over";
             }
             // Check if room is locked and player does NOT have a key
             else if (next.RequiresKey && !_inventory.HasItem(ItemType.Key))
             {
-                output = "You need a key to access this room";
+                return "You need a key to access this room";
             }
             // Prevent leaving monster alive
             else if (_currentRoom.HasMonster && _currentRoom.MonsterAlive)
             {
-                output = "The monster blocks your way";
-                //IsGameOver = true;
+                IsGameOver = true;
+                return "The monster hits you before you escape! Game Over";
             }
             else
             {
-                output = $"Going {dir}";
                 // Move to the next room
                 _currentRoom = next;
+
+                // Check this here because key is required
+                if (CheckWin())
+                {
+                    return "Congratulations, you won the game!\n";
+                }
+                return $"Going {dir}";
             }
-            return output;
         }
 
         public string Look()
@@ -58,15 +61,15 @@ namespace TestRaiders_TextAdventure.Core.Models
             ];
 
             var items = _currentRoom.GetItems();
-            if (items.Any())
+            if (items is null || items.Count == 0)
             {
-                output.Add("Items in the room:");
-                foreach (var item in items)
-                    output.Add($"- {item.Name} ({item.Type})");
+                output.Add("No items in this room.");
             }
             else
             {
-                output.Add("No items in this room.");
+                output.Add("Items in the room:");
+                foreach (var item in items)
+                    output.Add(item.ToString());
             }
 
             // Show available exits
@@ -88,40 +91,38 @@ namespace TestRaiders_TextAdventure.Core.Models
 
         public string Take(string? itemId)
         {
-            string output = "";
             if (string.IsNullOrWhiteSpace(itemId))
-                output = "There is no item in this room";
-
-            // Try to take the item from the current room
-            // NOTE: this will always succeed as GetItems gets called to call this function in Game.cs
-            IItem? item = _currentRoom.TakeItem(itemId);
-
-            if (item != null)
             {
-                _inventory.Add(item);
-                output = $"You picked up: {item.Name}";
+                return "Please give an item Id!";
             }
-            return output;
+            else
+            {
+                // Try to take the item from the current room
+                IItem? item = _currentRoom.TakeItem(itemId);
+                if (item != null)
+                {
+                    _inventory.Add(item);
+                    return $"You picked up: {item.Name}";
+                }
+                return "Didnt find matching item in this room!";
+            }
         }
 
-        public void Fight()
+        public string Fight()
         {
             if (_currentRoom.HasMonster && _currentRoom.MonsterAlive)
             {
                 _currentRoom.MonsterAlive = false;
-                Console.WriteLine("You have defeated the monster!");
+                return "You have defeated the monster!";
             }
             else
             {
-                Console.WriteLine("There is nothing to fight here.");
+                return "There is nothing to fight here.";
             }
         }
-        public bool HasWon()
+        public bool CheckWin()
         {
-            // The player wins if:
-            // 1. The current room requires a key (the “door” room)
-            // 2. The player has a key in their inventory
-            return _currentRoom.RequiresKey && _inventory.HasItem(ItemType.Key);
+            return _currentRoom.WinningRoom;
         }
     }
 }

@@ -4,11 +4,10 @@
     {
         void Start();
         void Quit();
-        void ProcessCommand(string command);
+        string ProcessCommand(string command);
         string ShowHelp();
         string ShowInventory();
         string Move(string dir);
-        string TakeItem();
         Direction? GetDirectionFromString(string input);
     }
 }

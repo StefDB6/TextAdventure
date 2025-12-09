@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TestRaiders_TextAdventure.Core.Interfaces;
+﻿using TestRaiders_TextAdventure.Core.Interfaces;
 
 namespace TestRaiders_TextAdventure.Core.Models
 {
@@ -17,13 +12,13 @@ namespace TestRaiders_TextAdventure.Core.Models
             IRoom start = new Room("Start");
             IRoom left = new Room("Left (deadly)", "A fatal pit awaits here.", isDeadly: true);
             IRoom right = new Room("Right (key room)", "You see something glinting on the floor.");
-            IRoom up = new Room("Up (locked door)", "A sturdy wooden door blocks your way.", requiresKey: true);
-            IRoom down = new Room("Down (armory)", "An old armory with dusty racks.");
-            IRoom deeper = new Room("Deeper (monster lair)", "You hear a growl in the dark...", hasMonster: true);
+            IRoom up = new Room("Up (locked door)", "The throne awaits you!", requiresKey: true, winningRoom: true);
+            IRoom down = new Room("Down (armory)", "An old armory with dusty weapon racks.");
+            IRoom deeper = new Room("Deeper (monster lair)", "A dark cave with a dangerous creature...", hasMonster: true);
 
             // Items
-            IItem key = new Item("Key", ItemType.Key, "Opens the locked door.");
-            IItem sword = new Item("Sword", ItemType.Sword, "Useful against monsters.");
+            IItem key = new Item("Key of Hope", ItemType.Key, "Opens the locked door.");
+            IItem sword = new Item("Sword of Destiny", ItemType.Sword, "Useful against monsters.");
 
             right.AddItem(key);    // East contains the key
             down.AddItem(sword);   // South contains the sword
@@ -36,7 +31,7 @@ namespace TestRaiders_TextAdventure.Core.Models
 
             // Optional return paths
             left.AddExit(Direction.East, start);
-            right.AddExit(Direction.West, start);
+            right.AddExit(Direction.West, start); // Not needed in practice because West kills instantly
             up.AddExit(Direction.South, start);
             down.AddExit(Direction.North, start);
 
