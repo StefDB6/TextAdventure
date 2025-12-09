@@ -1,20 +1,40 @@
-﻿using Ninject.Infrastructure.Language;
-using TestRaiders_TextAdventure.Core.Interfaces;
+﻿using TestRaiders_TextAdventure.Core.Interfaces;
 
 namespace TestRaiders_TextAdventure.Core.Models
 {
     internal class Game : IGame
     {
         //TODO: Remove tight coupling between Game and RoomsManager, now needed for inventory commands
-        readonly RoomsManager _roomsManager;
-        public bool _running = true;
-        private bool gameOver = false;
+        private readonly RoomsManager _roomsManager;
+        public bool Running = true;
 
         public Game(RoomsManager roomsManager)
         {
             _roomsManager = roomsManager;
         }
-        public void ProcessCommand(string command)
+
+        public void Start()
+        {
+            Console.WriteLine("Welcome to TestRaiders! Type 'help' for commands.");
+            Running = true;
+
+            // Main game loop: get command > run functions > show result
+            do
+            {
+                Console.Write("> ");
+                string command = Console.ReadLine() ?? "";
+                Console.WriteLine(ProcessCommand(command));
+                if (_roomsManager.IsGameOver || _roomsManager.CheckWin())
+                {
+                    Running = false;
+                }
+            } while (Running);
+
+            Console.WriteLine("Thanks for playing! (press enter to continue)");
+            Console.ReadLine();
+        }
+
+        public string ProcessCommand(string command)
         {
             string[] splitInput;
             string commandArg = "";
@@ -24,88 +44,78 @@ namespace TestRaiders_TextAdventure.Core.Models
                 splitInput = command.Split(' ');
                 command = splitInput[0];
                 commandArg = splitInput[1];
-                //Console.WriteLine(commandArg);
             }
+
             switch (command.ToLower())
             {
                 case "help":
-                    ShowHelp();
-                    break;
+                    return ShowHelp();
                 case "look":
-                    _roomsManager.Look();
-                    break;
+                    return _roomsManager.Look();
                 case "inventory":
-                    List<IItem> inventoryItems = _roomsManager._inventory.GetAll();
-                    Console.WriteLine("Your inventory:");
-                    foreach (var item in inventoryItems)
-                        Console.WriteLine($"- {item.Name} ({item.Type})");
-                    break;
+                    return ShowInventory();
                 case "go":
-                    Direction? direction = GetDirectionFromString(commandArg);
-                    if (direction == null)
-                    {
-                        Console.WriteLine("Invalid direction! (n/e/s/w)");
-                        break;
-                    }
-                    else
-                    {
-                        //Console.WriteLine($"Going {direction}");
-                        _roomsManager.Go((Direction)direction);
-                        break;
-                    }
+                    return Move(commandArg);
                 case "take":
-                    List<IItem> roomItems = (List<IItem>)_roomsManager.CurrentRoom.GetItems();
-                    if (roomItems.Count == 0)
-                    {
-                        break;
-                    }
-                    _roomsManager.Take(roomItems.First().Id);
-                    break;
+                    return _roomsManager.Take(commandArg);
                 case "fight":
-                    _roomsManager.Fight();
-                    break;
+                    return _roomsManager.Fight();
                 case "quit":
                     Quit();
-                    Console.WriteLine("Thanks for playing!");
-                    break;
+                    return "Closing...";
                 default:
-                    Console.WriteLine("Invalid command! Type 'help' to see a list of commands.");
-                    break;
+                    return "Invalid command! Type 'help' to see a list of commands.";
             }
-            //Console.WriteLine($"\nPress enter to continue...");
-            //Console.ReadLine();
-            //Console.Clear();
         }
 
         public void Quit()
         {
-            _running = false;
+            Running = false;
         }
 
-        public void ShowHelp()
+        public string ShowHelp()
         {
-            Console.WriteLine("List of commands:");
-            Console.WriteLine($"- look:\t\tShow current room, exits, items, and inventory");
-            Console.WriteLine($"- inventory:\tShow inventory");
-            Console.WriteLine($"- go n/e/s/w:\tMove in given direction");
-            Console.WriteLine($"- take:\t\tpick up item");
-            Console.WriteLine($"- fight:\tstart a fight with a monster");
-            Console.WriteLine($"- quit:\t\tstop the game");
+            string[] helpList =
+            [
+                "List of commands",
+                "look:\t\tShow current room, exits, items, and inventory",
+                "inventory:\tShow inventory",
+                "go n/e/s/w:\tMove in given direction",
+                "take item_id:\tPick up item with its Id",
+                "fight:\tStart a fight with a monster",
+                "quit:\t\tStop the game"
+            ];
+            // Format list of commands
+            return String.Join("\n- ", helpList);
         }
 
-        public void Start()
+        public string ShowInventory()
         {
-            _running = true;
-            do
+            List<string> output = ["Your inventory:"];
+            List<IItem> inventoryItems = _roomsManager._inventory.GetAll();
+            if (inventoryItems is null)
             {
-                Console.Write("> ");
-                string command = Console.ReadLine() ?? "";
-                ProcessCommand(command);
-                if (_roomsManager.IsGameOver)
-                {
-                    _running = false;
-                }
-            } while (_running);
+                return "You have no items in your inventory!";
+            }
+            foreach (var item in inventoryItems)
+            {
+                output.Add(item.ToString());
+            }
+
+            return String.Join("\n- ", output);
+        }
+
+        public string Move(string dir)
+        {
+            Direction? direction = GetDirectionFromString(dir);
+            if (direction == null)
+            {
+                return "Invalid direction! (n/e/s/w)";
+            }
+            else
+            {
+                return _roomsManager.Go(direction.Value);
+            }
         }
 
         public Direction? GetDirectionFromString(string input)

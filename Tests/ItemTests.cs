@@ -6,23 +6,23 @@ namespace Tests
     public class ItemTests
     {
         [TestMethod]
-        //does the constructor work when you create an Item object
+        // Constructor should correctly set given properties
         public void Constructor_Sets_Properties_And_Generates_Id()
         {
-            var item = new Item("Sleutel", ItemType.Key, "Opent deur");
+            Item item = new("Sleutel", ItemType.Key, "Opent deur");
 
             Assert.IsNotNull(item.Id, "Id mag niet null zijn.");
             StringAssert.StartsWith(item.Id, "item_");
             Assert.AreEqual("Sleutel", item.Name);
             Assert.AreEqual("Opent deur", item.Description);
-            Assert.AreEqual(ItemType.Key, item.Type);  // type gets set through ctor
+            Assert.AreEqual(ItemType.Key, item.Type);
         }
 
         [TestMethod]
         // does the second constructor (with chaining) work without a description
         public void Constructor_Chaining_Sets_AutoDescription()
         {
-            var item = new Item("Key", ItemType.Key); // uses constructor chaining
+            Item item = new("Key", ItemType.Key); // uses constructor chaining for descr.
 
             Assert.AreEqual("Key", item.Name);
             Assert.AreEqual("description: Key.", item.Description);
@@ -31,10 +31,10 @@ namespace Tests
 
 
         [TestMethod]
-        // does the second constructor (with chaining) work for a random ID
-        public void Constructor_Chaining_Creates_Id()
+        // does the constructor generate a correct Id
+        public void Constructor_Creates_Id()
         {
-            var item = new Item("Key", ItemType.Key); // uses constructor chaining
+            Item item = new("Key", ItemType.Key); // uses constructor chaining for descr.
 
             Assert.IsNotNull(item.Id);
             StringAssert.StartsWith(item.Id, "item_");
@@ -44,7 +44,7 @@ namespace Tests
         // an empty description also automatically gets a text
         public void Empty_Description_Generates_Default_Description()
         {
-            var item = new Item("Sword",ItemType.Sword, "");
+            var item = new Item("Sword", ItemType.Sword, "");
 
             Assert.AreEqual("description: Sword.", item.Description);
         }
@@ -53,38 +53,37 @@ namespace Tests
         [TestMethod]
         public void Each_Item_Has_Unique_Id()
         {
-            var i1 = new Item("Key",ItemType.Key, "Opens door");
-            var i2 = new Item("Sword",ItemType.Sword, "Against Monsters");
+            var i1 = new Item("Key", ItemType.Key, "Opens door");
+            var i2 = new Item("Sword", ItemType.Sword, "Against Monsters");
 
             Assert.AreNotEqual(i1.Id, i2.Id, "IDs have to be unique.");
         }
 
         [TestMethod]
-
-        // properties are not read-only, so we need to test whether they can still be modified
-        public void Properties_Are_Mutable() 
+        // some properties are not read-only, so we need to test whether they can still be modified
+        public void Properties_Are_Mutable()
         {
-            var item = new Item("Sword",ItemType.Sword, "Against Monsters");
+            var item = new Item("Sword", ItemType.Sword, "Against Monsters");
 
             item.Name = "Steel sword";
             item.Description = "Sharp";
 
             Assert.AreEqual("Steel sword", item.Name);
             Assert.AreEqual("Sharp", item.Description);
-            Assert.AreEqual(ItemType.Sword, item.Type); // has to stay the same (no setter)
         }
 
         [TestMethod]
         // test that the ToString() method of Item returns a readable text
         // that includes at least the name and ID of the item.
         // this way, we know that the method shows useful information for the player.
-        public void ToString_Contains_Name_And_Id()
+        public void ToString_Contains_Name_Id_And_Description()
         {
-            var item = new Item("Sleutel", ItemType.Key, "Opent deur");
-            var s = item.ToString();
+            Item item = new("Sleutel", ItemType.Key, "Opent deur");
+            string result = item.ToString();
 
-            StringAssert.Contains(s, "Sleutel");
-            StringAssert.Contains(s, item.Id);
+            StringAssert.Contains(result, item.Name);
+            StringAssert.Contains(result, item.Id);
+            StringAssert.Contains(result, item.Description);
         }
 
     }
