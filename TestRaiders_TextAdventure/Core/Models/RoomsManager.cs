@@ -1,4 +1,5 @@
-﻿using TestRaiders_TextAdventure.Core.Interfaces;
+﻿using TestRaiders_TextAdventure.Core.Encryption;
+using TestRaiders_TextAdventure.Core.Interfaces;
 
 namespace TestRaiders_TextAdventure.Core.Models
 {
@@ -11,6 +12,9 @@ namespace TestRaiders_TextAdventure.Core.Models
 
         public bool IsGameOver { get; private set; }
 
+        public string Keyshare { get; set; } = "";
+        public string JwtToken { get; set; } = "";
+
         public RoomsManager(IRoom startingRoom, IInventory inventory)
         {
             _currentRoom = startingRoom;
@@ -21,37 +25,75 @@ namespace TestRaiders_TextAdventure.Core.Models
         {
             var next = _currentRoom.GetExit(dir);
             if (next == null)
-            {
-                return "There is no exit here";
-            }
-            else if (next.IsDeadly)
-            {
-                IsGameOver = true;
-                return "You fell in a trap! Game Over";
-            }
-            // Check if room is locked and player does NOT have a key
-            else if (next.RequiresKey && !_inventory.HasItem(ItemType.Key))
-            {
-                return "You need a key to access this room";
-            }
-            // Prevent leaving monster alive
-            else if (_currentRoom.HasMonster && _currentRoom.MonsterAlive)
-            {
-                IsGameOver = true;
-                return "The monster hits you before you escape! Game Over";
-            }
-            else
-            {
-                // Move to the next room
-                _currentRoom = next;
+                return "There is no exit here.";
 
-                // Check this here because key is required
-                if (CheckWin())
-                {
-                    return "Congratulations, you won the game!\n";
-                }
-                return $"Going {dir}";
+            // Deadly trap → Game Over
+            if (next.IsDeadly)
+            {
+                IsGameOver = true;
+                return "You fell in a trap! Game Over.";
             }
+
+            // Cannot escape from a living monster
+            if (_currentRoom.HasMonster && _currentRoom.MonsterAlive)
+            {
+                IsGameOver = true;
+                return "The monster strikes you down as you try to flee! Game Over.";
+            }
+
+            // ---- LOCKED ROOM LOGIC ----
+            if (next.RequiresKey)
+            {
+                // Needs in-game key item
+                if (!_inventory.HasItem(ItemType.Key))
+                    return "You need a key to access this room.";
+
+                Console.Write("Enter passphrase to decrypt this room: ");
+                string? passphrase = Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(passphrase))
+                    return "Passphrase cannot be empty.";
+
+                // Select correct encrypted file based on room name
+                string? file = next.Name switch
+                {
+                    string name when name.Contains("Throne", StringComparison.OrdinalIgnoreCase)
+                        => "throne.enc",
+
+                    string name when name.Contains("Seal", StringComparison.OrdinalIgnoreCase)
+                        => "seal.enc",
+
+                    _ => null
+                };
+
+                if (file == null)
+                    return "ERROR: Unknown encrypted room file.";
+
+                // Attempt to decrypt room file
+                var decrypted = EncryptedRoomReader.TryDecrypt(file, Keyshare, passphrase);
+
+                if (decrypted == null)
+                    return "Incorrect passphrase. The room remains locked.";
+
+                // Decryption successful → show room description
+                Console.WriteLine();
+                Console.WriteLine("Room decrypted successfully!");
+                Console.WriteLine("-------------------------------------------");
+                Console.WriteLine(decrypted);
+                Console.WriteLine("-------------------------------------------");
+                Console.WriteLine();
+            }
+
+            // ---- MOVE TO NEXT ROOM ----
+            _currentRoom = next;
+
+            if (CheckWin())
+            {
+                IsGameOver = true;
+                return "Congratulations, you won the game!";
+            }
+
+            return $"You go {dir}.";
         }
 
         public string Look()

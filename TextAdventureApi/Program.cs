@@ -143,6 +143,40 @@ namespace TextAdventureApi
             })
             .RequireAuthorization();
 
+            app.MapGet("/api/keys/keyshare/{roomId}", async (string roomId, HttpContext http, TextAdventureDbContext db) =>
+            {
+                var user = http.User;
+
+                if (user?.Identity?.IsAuthenticated != true)
+                    return Results.Unauthorized();
+
+                // Claims
+                var role = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+
+                // Keyshare zoeken
+                var keyshare = await db.KeyShares
+                    .FirstOrDefaultAsync(k => k.RoomId.ToLower() == roomId.ToLower());
+
+                if (keyshare == null)
+                    return Results.NotFound("Room has no keyshare.");
+
+                // Rolcontrole
+                bool allowed =
+                    role == "Admin" ||
+                    (role == "Player" && keyshare.MinRole == "Player");
+
+                if (!allowed)
+                    return Results.Forbid();
+
+                // OK
+                return Results.Ok(new
+                {
+                    RoomId = keyshare.RoomId,
+                    KeyShare = keyshare.Share
+                });
+            })
+            .RequireAuthorization();
+
             app.Run();
         }
     }

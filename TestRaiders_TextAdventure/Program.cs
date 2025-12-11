@@ -17,6 +17,9 @@ namespace TestRaiders_TextAdventure
             var services = new ServiceCollection();
             GameSetup.RegisterDependencies(services);
 
+            // Zorg dat de encrypted rooms bestaan (.enc files)
+            TestRaiders_TextAdventure.Core.Encryption.EncryptedRoomGenerator.EnsureEncryptedRoomsExist();
+
             // 1) World initialiseren
             var roomsManager = GameSetup.InitializeWorld();
 
@@ -35,11 +38,47 @@ namespace TestRaiders_TextAdventure
             Console.WriteLine($"Login OK, token (ingekort): {token[..20]}...");
             Console.WriteLine();
 
-            // 4) Game starten
+            // 4) Fetch keyshare from API
+            var keyshare = await GetKeyshareFromApiAsync(token);
+            if (keyshare == null)
+            {
+                Console.WriteLine("Could not retrieve keyshare.");
+                return;
+            }
+
+            // 5) Store in RoomsManager
+            roomsManager.Keyshare = keyshare;
+            roomsManager.JwtToken = token;
+
+            // 6) Game starten
             var game = new Game(roomsManager);
             game.Start();
           
             Console.ReadKey();
+        }
+
+        private static async Task<string?> GetKeyshareFromApiAsync(string token)
+        {
+            using var http = new HttpClient { BaseAddress = new Uri(ApiBaseUrl) };
+            http.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            var response = await http.GetAsync("/api/keys/keyshare/main");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"Failed to retrieve keyshare: {(int)response.StatusCode} - {response.ReasonPhrase}");
+                return null;
+            }
+
+            var json = await response.Content.ReadFromJsonAsync<KeyshareDto>();
+            return json?.KeyShare;
+        }
+
+        private class KeyshareDto
+        {
+            public string RoomId { get; set; } = "";
+            public string KeyShare { get; set; } = "";
         }
 
         private static async Task RegisterWithApiAsync()

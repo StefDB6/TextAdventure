@@ -9,37 +9,60 @@ namespace TestRaiders_TextAdventure.Core.Models
         {
             IInventory inventory = new Inventory();
 
-            // Rooms
+            // --- ROOMS ---
             Room start = new("Starting room");
-            Room left = new("Left (deadly)", "A fatal pit awaits here.", isDeadly: true);
-            Room right = new("Right (key room)", "You see something glinting on the floor.");
-            Room up = new("Up (locked door)", "The throne awaits you!", requiresKey: true, winningRoom: true);
-            Room down = new("Down (armory)", "An old armory with dusty weapon racks.");
-            Room deeper = new("Deeper (monster lair)", "A dark cave with a dangerous creature...", hasMonster: true);
 
-            // Items
-            Item key = new("Key of Success", ItemType.Key, "Opens the way forward.");
+            Room left = new("Left",
+                "A fatal pit awaits here.",
+                isDeadly: true);
+
+            Room right = new("Right",
+                "You see something glinting on the floor.");
+
+            Room up = new("Throne Room",
+                "A majestic throne stands before you.",
+                requiresKey: true);
+
+            Room down = new("Armory",
+                "An old armory with dusty weapon racks.");
+
+            Room deeper = new("Deeper",
+                "A dark cave with a dangerous creature...",
+                hasMonster: true);
+
+            Room sealRoom = new("Seal Room",
+                "A mysterious ancient chamber sealed by magic.",
+                requiresKey: true, winningRoom: true);
+
+            // --- ITEMS ---
+            Item keyA = new("Key A", ItemType.Key, "Opens the first locked door.");
+            Item keyB = new("Key B", ItemType.Key, "Opens the second locked door.");
             Item sword = new("Sword of Destiny", ItemType.Sword, "Useful against monsters.");
 
-            // Add Items to Rooms
-            right.AddItem(key);    // East contains the key
-            down.AddItem(sword);   // South contains the sword
+            // --- PLACE ITEMS ---
+            right.AddItem(keyA);     // Key A found in right
+            deeper.AddItem(keyB);    // Key B found deeper after monster
+            down.AddItem(sword);     // optional sword pickup
 
-            // Exits from start
+            // --- EXITS FROM START ---
             start.AddExit(Direction.West, left);
             start.AddExit(Direction.East, right);
             start.AddExit(Direction.North, up);
             start.AddExit(Direction.South, down);
 
-            // Return paths
+            // --- RETURN PATHS ---
             left.AddExit(Direction.East, start);
-            right.AddExit(Direction.West, start); // (Not needed in practice because West kills instantly)
+            right.AddExit(Direction.West, start);
             up.AddExit(Direction.South, start);
             down.AddExit(Direction.North, start);
 
-            // Connect 2 south rooms
+            // --- DEEP ZONE ---
             down.AddExit(Direction.South, deeper);
             deeper.AddExit(Direction.North, down);
+
+            // --- SECOND LOCKED ROOM ---
+            deeper.AddExit(Direction.South, sealRoom);
+            sealRoom.AddExit(Direction.North, deeper);
 
             return new RoomsManager(start, inventory);
         }
