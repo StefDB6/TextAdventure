@@ -1,7 +1,9 @@
-﻿using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using TextAdventureApi.Data;
 using TextAdventureApi.Dtos;
 using TextAdventureApi.Options;
@@ -119,6 +121,27 @@ namespace TextAdventureApi
 
                     return Results.Ok(result); // { token, role }
                 });
+
+            // 4.3 Huidige user (GET /api/auth/me)
+            app.MapGet("/api/auth/me", (HttpContext http) =>
+            {
+                var principal = http.User;
+
+                if (principal?.Identity?.IsAuthenticated != true)
+                    return Results.Unauthorized();
+
+                var username = principal.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub)?.Value;
+                var userId = principal.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+                var role = principal.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+
+                return Results.Ok(new
+                {
+                    Id = userId,
+                    Username = username,
+                    Role = role
+                });
+            })
+            .RequireAuthorization();
 
             app.Run();
         }

@@ -109,6 +109,7 @@ namespace TextAdventureApi.Services
             var claims = new[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Username),
+                new Claim("uid", user.Id.ToString()),
                 new Claim(ClaimTypes.Role, user.Role.ToString())
             };
 
