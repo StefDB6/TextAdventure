@@ -40,13 +40,18 @@ namespace TestRaiders_TextAdventure.Core.Encryption
         /// Encrypts a plaintext file using AES(CBC) + SHA256(keyshare:passphrase) derived key.
         private static void GenerateEncryptedFile(string inputPath, string outputPath)
         {
-            if (!File.Exists(inputPath))
+            // Try to resolve the file from several likely locations
+            string? resolved = FindPlaintextFile(inputPath);
+            if (resolved == null)
             {
                 Console.WriteLine($"ERROR: Missing plaintext file: {inputPath}");
+                Console.WriteLine("Searched working directory and output folders. To fix:");
+                Console.WriteLine("- In Visual Studio set the file's __Build Action__ = __Content__");
+                Console.WriteLine("  and __Copy to Output Directory__ = __Copy if newer__.");
                 return;
             }
 
-            string plaintext = File.ReadAllText(inputPath);
+            string plaintext = File.ReadAllText(resolved);
 
             // Derive encryption key from keyshare + passphrase
             byte[] key = DeriveKey(Keyshare, Passphrase);
@@ -61,7 +66,50 @@ namespace TestRaiders_TextAdventure.Core.Encryption
             fs.Write(iv, 0, iv.Length);
             fs.Write(encryptedBytes, 0, encryptedBytes.Length);
 
-            Console.WriteLine($"{outputPath} generated successfully.");
+            Console.WriteLine($"{outputPath} generated successfully from {resolved}.");
+        }
+
+        // Attempts to find the plaintext file from several locations:
+        // 1) as given, 2) in AppContext.BaseDirectory, 3) recursive search under base directory,
+        // 4) walk up parents searching for the file in project tree.
+        private static string? FindPlaintextFile(string inputPath)
+        {
+            // 1) as given
+            if (File.Exists(inputPath))
+                return Path.GetFullPath(inputPath);
+
+            // 2) in the runtime base directory (bin/**)
+            string baseDir = AppContext.BaseDirectory ?? Directory.GetCurrentDirectory();
+            string candidate = Path.Combine(baseDir, inputPath);
+            if (File.Exists(candidate))
+                return candidate;
+
+            // 3) recursive search under base directory (may be expensive but limited to a single pattern)
+            try
+            {
+                var found = Directory.EnumerateFiles(baseDir, Path.GetFileName(inputPath), SearchOption.AllDirectories).FirstOrDefault();
+                if (found != null)
+                    return found;
+            }
+            catch { /* ignore IO exceptions during search */ }
+
+            // 4) walk up a few parent directories (project root scenarios)
+            var dir = new DirectoryInfo(baseDir);
+            for (int i = 0; i < 6 && dir.Parent != null; i++)
+            {
+                dir = dir.Parent;
+                string check = Path.Combine(dir.FullName, inputPath);
+                if (File.Exists(check))
+                    return check;
+
+                // also check common project relative path
+                string alt = Path.Combine(dir.FullName, "TestRaiders_TextAdventure", "Core", "Encryption", inputPath);
+                if (File.Exists(alt))
+                    return alt;
+            }
+
+            // Not found
+            return null;
         }
 
         /// SHA256(keyshare + ":" + passphrase)
