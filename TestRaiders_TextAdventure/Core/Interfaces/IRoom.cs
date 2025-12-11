@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TestRaiders_TextAdventure.Core.Interfaces
+﻿namespace TestRaiders_TextAdventure.Core.Interfaces
 {
     // Represents one location in the text adventure world.
     // A room can hold items, connect to other rooms, and may contain dangers or restrictions.
@@ -28,6 +22,8 @@ namespace TestRaiders_TextAdventure.Core.Interfaces
         // Indicates whether the monster is still alive.
         bool MonsterAlive { get; set; }
 
+        //
+        bool WinningRoom { get; }
         // Creates a directional link to another room.
         void AddExit(Direction direction, IRoom room);
 
@@ -41,11 +37,12 @@ namespace TestRaiders_TextAdventure.Core.Interfaces
         IItem? TakeItem(string id);
 
         // Returns all items currently in the room.
-        IEnumerable<IItem> GetItems();
+        IList<IItem> GetItems();
 
         // Helper: generate a default description from the room name
-        static string GenerateDefaultDescription(string name) {
+        static string GenerateDefaultDescription(string name)
+        {
             return $"description: {name}.";
-								}
+        }
     }
 }

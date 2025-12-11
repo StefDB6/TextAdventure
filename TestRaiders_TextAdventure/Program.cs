@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
@@ -37,10 +37,8 @@ namespace TestRaiders_TextAdventure
 
             // 4) Game starten
             var game = new Game(roomsManager);
-            Console.WriteLine("Welcome to TestRaiders! Type 'help' for commands.");
             game.Start();
-
-            Console.WriteLine("Game exited. Press any key to close...");
+          
             Console.ReadKey();
         }
 
