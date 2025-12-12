@@ -48,11 +48,10 @@ namespace TestRaiders_TextAdventure.Core.Models
                 if (!_inventory.HasItem(ItemType.Key))
                     return "You need a key to access this room.";
 
-                Console.Write("Enter passphrase to decrypt this room: ");
-                string? passphrase = Console.ReadLine();
 
-                if (string.IsNullOrWhiteSpace(passphrase))
-                    return "Passphrase cannot be empty.";
+                // bc sha (keyshare : passphrase)
+                // we have require auth for keyshare api call so im hardcoding this (dont stike me down fuck you)
+                string passphrase = "coolpasswoord";
 
                 // Select correct encrypted file based on room name
                 string? file = next.Name switch
