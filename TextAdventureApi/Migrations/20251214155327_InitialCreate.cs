@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace TextAdventureApi.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -44,7 +44,7 @@ namespace TextAdventureApi.Migrations
             migrationBuilder.InsertData(
                 table: "KeyShares",
                 columns: new[] { "Id", "MinRole", "RoomId", "Share" },
-                values: new object[] { new Guid("df8b35d3-6556-4376-956d-a7ecad8fa657"), "Player", "main", "ABC-EFG-HIJK" });
+                values: new object[] { new Guid("55a42576-5f02-4da8-8be1-7af64b76be8d"), "Player", "main", "ABC-EFG-HIJK" });
         }
 
         /// <inheritdoc />

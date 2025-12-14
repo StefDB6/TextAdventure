@@ -47,7 +47,7 @@ namespace TextAdventureApi.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("df8b35d3-6556-4376-956d-a7ecad8fa657"),
+                            Id = new Guid("55a42576-5f02-4da8-8be1-7af64b76be8d"),
                             MinRole = "Player",
                             RoomId = "main",
                             Share = "ABC-EFG-HIJK"

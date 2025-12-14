@@ -133,9 +133,8 @@ namespace TestRaiders_TextAdventure
             }
         }
 
-        // ---------------------------
         // REGISTER
-        // ---------------------------
+        
         private static async Task<string?> RegisterWithApiAsync()
         {
             using var http = new HttpClient { BaseAddress = new Uri(ApiBaseUrl) };
@@ -181,9 +180,8 @@ namespace TestRaiders_TextAdventure
             return null;
         }
 
-        // ---------------------------
-        // LOGIN (PASSWORD ONLY) + LOOP
-        // ---------------------------
+       // LOGIN (PASSWORD ONLY) + LOOP
+       
         private static async Task<string?> LoginWithApiAsync(string username)
         {
             using var http = new HttpClient { BaseAddress = new Uri(ApiBaseUrl) };
@@ -236,9 +234,7 @@ namespace TestRaiders_TextAdventure
             }
         }
 
-        // ---------------------------
         // KEYSHARE
-        // ---------------------------
         private static async Task<string?> GetKeyshareFromApiAsync(string token)
         {
             using var http = new HttpClient { BaseAddress = new Uri(ApiBaseUrl) };

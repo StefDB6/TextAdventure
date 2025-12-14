@@ -12,8 +12,8 @@ using TextAdventureApi.Data;
 namespace TextAdventureApi.Migrations
 {
     [DbContext(typeof(TextAdventureDbContext))]
-    [Migration("20251211194238_keyshare")]
-    partial class keyshare
+    [Migration("20251214155327_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -50,7 +50,7 @@ namespace TextAdventureApi.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("04726e2d-23f4-4ce8-982b-0eff1f327f01"),
+                            Id = new Guid("55a42576-5f02-4da8-8be1-7af64b76be8d"),
                             MinRole = "Player",
                             RoomId = "main",
                             Share = "ABC-EFG-HIJK"
