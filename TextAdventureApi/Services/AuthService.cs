@@ -109,6 +109,7 @@ namespace TextAdventureApi.Services
             var claims = new[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Username),
+                new Claim("uid", user.Id.ToString()),
                 new Claim(ClaimTypes.Role, user.Role.ToString())
             };
 
@@ -121,5 +122,14 @@ namespace TextAdventureApi.Services
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+        public List<string> GetUsernames()
+        {
+            return _db.Users
+                .OrderBy(u => u.Username)
+                .Select(u => u.Username)
+                .ToList();
+        }
+
     }
 }

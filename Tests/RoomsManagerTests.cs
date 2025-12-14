@@ -91,6 +91,9 @@ namespace Tests
                 "Game should not end when trying to enter a locked room without key.");
         }
 
+
+        // Fails because jwt token needed, not feasible to get because we would need to run full gamesetup
+        // Could be tested in an end-to-end test
         [TestMethod]
         public void Go_ToLockedRoom_WithKey_ChangesRoom()
         {

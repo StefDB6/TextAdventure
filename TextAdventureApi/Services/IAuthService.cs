@@ -8,6 +8,9 @@ namespace TextAdventureApi.Services
         User Register(RegisterRequest request);
         bool UsernameExists(string username);
 
+        List<string> GetUsernames();
+
+
         LoginResponse? Login(LoginRequest request, out string? error, out bool lockedOut);
     }
 }

@@ -14,6 +14,7 @@ namespace Tests
         private IRoom _up;
         private IRoom _down;
         private IRoom _deeper;
+        private IRoom _sealRoom;
         [TestInitialize]
         public void Setup()
         {
@@ -25,6 +26,7 @@ namespace Tests
             _up = _start.GetExit(Direction.North)!;
             _down = _start.GetExit(Direction.South)!;
             _deeper = _down.GetExit(Direction.South)!;
+            _sealRoom = _deeper.GetExit(Direction.South)!;
         }
 
         [TestMethod]
@@ -47,8 +49,9 @@ namespace Tests
         public void Rooms_Have_Correct_Flags()
         {
             Assert.IsTrue(_left.IsDeadly, "Left should be deadly.");
-            Assert.IsTrue(_up.RequiresKey && _up.WinningRoom, "Up should require a key and be the winning room");
+            Assert.IsTrue(_up.RequiresKey, "Up should require a key.");
             Assert.IsTrue(_deeper.HasMonster && _deeper.MonsterAlive, "Deeper should contain a living monster.");
+            Assert.IsTrue(_sealRoom.RequiresKey && _sealRoom.WinningRoom, "Sealed room should require a key and be the winning room");
         }
 
         [TestMethod]
@@ -56,6 +59,7 @@ namespace Tests
         {
             Assert.IsTrue(_right.GetItems().Any(i => i.Type == ItemType.Key), "Right should contain a key.");
             Assert.IsTrue(_down.GetItems().Any(i => i.Type == ItemType.Sword), "Down should contain a sword.");
+            Assert.IsTrue(_deeper.GetItems().Any(i => i.Type == ItemType.Key), "Deeper should contain a key.");
         }
 
         [TestMethod]
