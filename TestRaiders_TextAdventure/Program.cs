@@ -76,42 +76,52 @@ namespace TestRaiders_TextAdventure
                 if (users.Count == 0)
                 {
                     Console.WriteLine("No accounts found. You must register.\n");
+
                     var created = await RegisterWithApiAsync();
-                    if (created != null) return created;
-
-                    continue;
+                    if (created != null)
+                    {
+                        return created;
+                    }
                 }
-
-                for (int i = 0; i < users.Count; i++)
+                else
                 {
-                    Console.WriteLine($"{i + 1}) {users[i]}");
+                    for (int i = 0; i < users.Count; i++)
+                    {
+                        Console.WriteLine($"{i + 1}) {users[i]}");
+                    }
+
+                    Console.WriteLine("R) Register new account");
+                    Console.WriteLine("Q) Quit");
+                    Console.Write("Choose: ");
+
+                    var input = (Console.ReadLine() ?? "").Trim();
+
+                    if (input.Equals("Q", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return null;
+                    }
+                    else if (input.Equals("R", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var created = await RegisterWithApiAsync();
+                        if (created != null)
+                        {
+                            return created;
+                        }
+                    }
+                    else if (int.TryParse(input, out int choice) &&
+                             choice >= 1 &&
+                             choice <= users.Count)
+                    {
+                        return users[choice - 1];
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid choice. Try again.\n");
+                    }
                 }
-
-                Console.WriteLine("R) Register new account");
-                Console.WriteLine("Q) Quit");
-                Console.Write("Choose: ");
-
-                var input = (Console.ReadLine() ?? "").Trim();
-
-                if (input.Equals("Q", StringComparison.OrdinalIgnoreCase))
-                    return null;
-
-                if (input.Equals("R", StringComparison.OrdinalIgnoreCase))
-                {
-                    var created = await RegisterWithApiAsync();
-                    if (created != null) return created;
-
-                    continue;
-                }
-
-                if (int.TryParse(input, out int choice) && choice >= 1 && choice <= users.Count)
-                {
-                    return users[choice - 1];
-                }
-
-                Console.WriteLine("Invalid choice. Try again.\n");
             }
         }
+
 
         private static async Task<List<string>> GetUsersAsync()
         {
