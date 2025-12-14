@@ -122,5 +122,14 @@ namespace TextAdventureApi.Services
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+        public List<string> GetUsernames()
+        {
+            return _db.Users
+                .OrderBy(u => u.Username)
+                .Select(u => u.Username)
+                .ToList();
+        }
+
     }
 }

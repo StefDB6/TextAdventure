@@ -122,6 +122,13 @@ namespace TextAdventureApi
                     return Results.Ok(result); // { token, role }
                 });
 
+            app.MapGet("/api/auth/users", (IAuthService authService) =>
+            {
+                var users = authService.GetUsernames();
+                return Results.Ok(users);
+            });
+
+
             // 4.3 Huidige user (GET /api/auth/me)
             app.MapGet("/api/auth/me", (HttpContext http) =>
             {
