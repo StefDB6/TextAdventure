@@ -21,7 +21,7 @@ namespace TestRaiders_TextAdventure.Core.Encryption
         private static readonly string SealEnc = "seal.enc";
 
 
-        /// Automatically generates .enc files if they do not exist yet.
+        // Automatically generates .enc files if they do not exist yet.
         public static void EnsureEncryptedRoomsExist()
         {
             if (!File.Exists(ThroneEnc))
@@ -37,7 +37,7 @@ namespace TestRaiders_TextAdventure.Core.Encryption
             }
         }
 
-        /// Encrypts a plaintext file using AES(CBC) + SHA256(keyshare:passphrase) derived key.
+        // Encrypts a plaintext file using AES(CBC) + SHA256(keyshare:passphrase) derived key.
         private static void GenerateEncryptedFile(string inputPath, string outputPath)
         {
             // Try to resolve the file from several likely locations
@@ -69,9 +69,9 @@ namespace TestRaiders_TextAdventure.Core.Encryption
             Console.WriteLine($"{outputPath} generated successfully from {resolved}.");
         }
 
-        // Attempts to find the plaintext file from several locations:
-        // 1) as given, 2) in AppContext.BaseDirectory, 3) recursive search under base directory,
-        // 4) walk up parents searching for the file in project tree.
+        // I HAVE NO IDEA WHY MY CODE CANT FIND THE PLAINTEXT FILES SOMETIMES BUT THIS FIXES IT
+        // ENJOY THIS HORRIBLE CODE :)
+        // CREDITS TO CHATGPT FOR HELPING ME FIGURE THIS OUT
         private static string? FindPlaintextFile(string inputPath)
         {
             // 1) as given

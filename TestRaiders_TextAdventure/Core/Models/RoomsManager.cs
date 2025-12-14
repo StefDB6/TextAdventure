@@ -81,7 +81,6 @@ namespace TestRaiders_TextAdventure.Core.Models
                 Console.WriteLine();
             }
 
-            // Admin bypass feedback (optional, but helpful)
             if (IsAdmin)
             {
                 if (next.RequiresKey)
@@ -94,7 +93,6 @@ namespace TestRaiders_TextAdventure.Core.Models
                     Console.WriteLine("[ADMIN] Monster ignored.");
             }
 
-            // Move is now guaranteed safe
             _currentRoom = next;
 
             if (CheckWin())
