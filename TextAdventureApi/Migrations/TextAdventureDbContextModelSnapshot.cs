@@ -47,7 +47,7 @@ namespace TextAdventureApi.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("55a42576-5f02-4da8-8be1-7af64b76be8d"),
+                            Id = new Guid("0433c9ce-f0ed-41d0-acc8-14a5ab1e5f76"),
                             MinRole = "Player",
                             RoomId = "main",
                             Share = "ABC-EFG-HIJK"
@@ -80,6 +80,17 @@ namespace TextAdventureApi.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("b659c375-b559-45e1-a83f-5e5b6b2a0801"),
+                            FailedLoginAttempts = 0,
+                            IsLockedOut = false,
+                            PasswordHash = "8C6976E5B5410415BDE908BD4DEE15DFB167A9C873FC4BB8A81F6F2AB448A918",
+                            Role = 1,
+                            Username = "admin"
+                        });
                 });
 #pragma warning restore 612, 618
         }

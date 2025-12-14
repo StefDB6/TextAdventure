@@ -1,4 +1,6 @@
-﻿using TestRaiders_TextAdventure.Core.Encryption;
+﻿using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using TestRaiders_TextAdventure.Core.Encryption;
 using TestRaiders_TextAdventure.Core.Interfaces;
 
 namespace TestRaiders_TextAdventure.Core.Models
@@ -14,6 +16,7 @@ namespace TestRaiders_TextAdventure.Core.Models
 
         public string Keyshare { get; set; } = "";
         public string JwtToken { get; set; } = "";
+        public bool IsAdmin { get; private set; }
 
         public RoomsManager(IRoom startingRoom, IInventory inventory)
         {
@@ -24,36 +27,33 @@ namespace TestRaiders_TextAdventure.Core.Models
         public string Go(Direction dir)
         {
             var next = _currentRoom.GetExit(dir);
+
+            // Topology is absolute
             if (next == null)
                 return "There is no exit here.";
 
-            // Deadly trap → Game Over
-            if (next.IsDeadly)
+            // Deadly room
+            if (next.IsDeadly && !IsAdmin)
             {
                 IsGameOver = true;
                 return "You fell in a trap! Game Over.";
             }
 
-            // Cannot escape from a living monster
-            if (_currentRoom.HasMonster && _currentRoom.MonsterAlive)
+            // Monster prevents escape
+            if (_currentRoom.HasMonster && _currentRoom.MonsterAlive && !IsAdmin)
             {
                 IsGameOver = true;
                 return "The monster strikes you down as you try to flee! Game Over.";
             }
 
-            // ---- LOCKED ROOM LOGIC ----
-            if (next.RequiresKey)
+            // Locked room logic
+            if (next.RequiresKey && !IsAdmin)
             {
-                // Needs in-game key item
                 if (!_inventory.HasItem(ItemType.Key))
                     return "You need a key to access this room.";
 
-
-                // bc sha (keyshare : passphrase)
-                // we have require auth for keyshare api call so im hardcoding this (dont stike me down fuck you)
                 string passphrase = "coolpasswoord";
 
-                // Select correct encrypted file based on room name
                 string? file = next.Name switch
                 {
                     string name when name.Contains("Throne", StringComparison.OrdinalIgnoreCase)
@@ -68,13 +68,11 @@ namespace TestRaiders_TextAdventure.Core.Models
                 if (file == null)
                     return "ERROR: Unknown encrypted room file.";
 
-                // Attempt to decrypt room file
                 var decrypted = EncryptedRoomReader.TryDecrypt(file, Keyshare, passphrase);
 
                 if (decrypted == null)
                     return "Incorrect passphrase. The room remains locked.";
 
-                // Decryption successful → show room description
                 Console.WriteLine();
                 Console.WriteLine("Room decrypted successfully!");
                 Console.WriteLine("-------------------------------------------");
@@ -83,7 +81,20 @@ namespace TestRaiders_TextAdventure.Core.Models
                 Console.WriteLine();
             }
 
-            // ---- MOVE TO NEXT ROOM ----
+            // Admin bypass feedback (optional, but helpful)
+            if (IsAdmin)
+            {
+                if (next.RequiresKey)
+                    Console.WriteLine("[ADMIN] Lock bypassed.");
+
+                if (next.IsDeadly)
+                    Console.WriteLine("[ADMIN] Deadly room ignored.");
+
+                if (_currentRoom.HasMonster && _currentRoom.MonsterAlive)
+                    Console.WriteLine("[ADMIN] Monster ignored.");
+            }
+
+            // Move is now guaranteed safe
             _currentRoom = next;
 
             if (CheckWin())
@@ -92,8 +103,11 @@ namespace TestRaiders_TextAdventure.Core.Models
                 return "Congratulations, you won the game!";
             }
 
-            return $"You go {dir}.";
+            return IsAdmin
+                ? $"You phase through restrictions and go {dir}."
+                : $"You go {dir}.";
         }
+
 
         public string Look()
         {
@@ -164,6 +178,24 @@ namespace TestRaiders_TextAdventure.Core.Models
         public bool CheckWin()
         {
             return _currentRoom.WinningRoom;
+        }
+
+        public async Task LoadPlayerRoleAsync(string apiBaseUrl)
+        {
+            using var client = new HttpClient();
+            client.BaseAddress = new Uri(apiBaseUrl);
+
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", JwtToken);
+
+            var response = await client.GetAsync("/api/auth/me");
+
+            if (!response.IsSuccessStatusCode)
+                throw new Exception("Failed to retrieve player role.");
+
+            var me = await response.Content.ReadFromJsonAsync<AuthMeResponse>();
+
+            IsAdmin = string.Equals(me?.Role, "Admin", StringComparison.OrdinalIgnoreCase);
         }
     }
 }

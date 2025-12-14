@@ -57,6 +57,14 @@ namespace TestRaiders_TextAdventure
             roomsManager.Keyshare = keyshare;
             roomsManager.JwtToken = token;
 
+            await roomsManager.LoadPlayerRoleAsync(ApiBaseUrl);
+
+            Console.WriteLine(
+                roomsManager.IsAdmin
+                    ? "[ADMIN MODE ENABLED]"
+                    : "[PLAYER MODE]"
+            );
+
             // 6) Game starten
             var game = new Game(roomsManager);
             game.Start();

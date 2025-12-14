@@ -7,6 +7,9 @@
         string Take(string itemId);
         string Fight();
         bool CheckWin();
+
         bool IsGameOver { get; }
+
+        bool IsAdmin { get; }
     }
 }
