@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TextAdventureApi.Data;
 
@@ -11,9 +12,11 @@ using TextAdventureApi.Data;
 namespace TextAdventureApi.Migrations
 {
     [DbContext(typeof(TextAdventureDbContext))]
-    partial class TextAdventureDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251212142006_init")]
+    partial class init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
